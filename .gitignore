@@ -1,5 +1,8 @@
 *
+!Assets
 !Assets/**
 !Packages/**
+!Packages
 !ProjectSettings/**
+!ProjectSettings
 !.git*
