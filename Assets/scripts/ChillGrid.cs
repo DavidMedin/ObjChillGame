@@ -10,6 +10,7 @@ namespace DefaultNamespace
 
     public struct Hex
     {
+        public Vector2Int chunk;
         public int r;
         public int q;
     }
@@ -28,12 +29,12 @@ namespace DefaultNamespace
         private static Vector2 r_basis = new Vector2((float)Math.Sqrt(3)/2, (float)3/2);
 
         public GameObject grid_prefab;
-        public Vector3 Hex2Global(Vector2Int chunk, Hex hex)
+        public Vector3 Hex2Global(Hex hex)
         {
             var new_hex = new Hex
             {
-                q = hex.q + chunk.x * _chunk_size,
-                r = hex.r + chunk.y * _chunk_size
+                q = hex.q + hex.chunk.x * _chunk_size,
+                r = hex.r + hex.chunk.y * _chunk_size
             };
             return new Vector3
             {
@@ -42,7 +43,7 @@ namespace DefaultNamespace
             };
         }
 
-        public (Vector2Int, Hex) Global2Hex(Vector2 point)
+        public Hex Global2Hex(Vector2 point)
         {
             var vec2 = new Vector2((float)Math.Sqrt(3)/3 * point.x - (float)1/3 * point.y, (float)2/3 * point.y) / _cell_size;
 
@@ -53,8 +54,10 @@ namespace DefaultNamespace
             var chunk_i = new Vector2Int((int)Math.Floor(chunk.x), (int)Math.Floor(chunk.y));
             vec2 -= chunk_i * _chunk_size;
 
-            return (chunk_i, new Hex{q=(int)vec2.x,r=(int)vec2.y});
+            // return (chunk_i, new Hex{q=(int)vec2.x,r=(int)vec2.y});
+            return new Hex { chunk = chunk_i, q = (int)vec2.x, r = (int)vec2.y };
         }
+        
 
         // Input fractional axial space vector and return a Hex.
         private Hex AxialRound(Vector2 point)
@@ -76,23 +79,23 @@ namespace DefaultNamespace
 
             return new Hex { q = (int)q, r = (int)r };
         }
-        public GameObject CreateHex(Vector2Int chunk_i, Hex hex)
+        public GameObject CreateHex(Hex hex)
         {
             // Add a hexagon to the map.
-            var thing = Hex2Global(chunk_i, hex);
+            var thing = Hex2Global(hex);
             var game_obj = Instantiate(grid_prefab, thing, Quaternion.Euler(-90,0,0));
 
             GameObject[,] chunk;
-            if (!_chunks.ContainsKey(chunk_i))
+            if (!_chunks.ContainsKey(hex.chunk))
             {
                 // Create this boi.
-                print($"Loading new chunk! {chunk_i.x} {chunk_i.y}");
+                print($"Loading new chunk! {hex.chunk.x} {hex.chunk.y}");
                 chunk = new GameObject[_chunk_size,_chunk_size];
-                _chunks[chunk_i] = chunk;
+                _chunks[hex.chunk] = chunk;
             }
             else
             {
-                chunk = _chunks[chunk_i];
+                chunk = _chunks[hex.chunk];
             }
             
             // Add the GameObject into this chunk.
