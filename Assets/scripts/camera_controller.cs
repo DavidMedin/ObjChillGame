@@ -8,16 +8,19 @@ public class camera_controller : MonoBehaviour
 {
     [SerializeField]
     private float cameraSpeed = 10f;
-
-    [SerializeField] private GameObject gridCube;
-    
+    [SerializeField] private GameObject _grid_indicator;
+    [SerializeField] private GameObject hexagon_model;
+    // [SerializeField] private GameObject forest_prefab;
+    // [SerializeField] private GameObject city_prefab;
+    // [SerializeField] private GameObject plains_prefab;
+    // private GameObject[] biomes;
     private Camera _camera;
 
     private ChillGrid _grid;
     // Start is called before the first frame update
     void Start()
     {
-       
+        // biomes = new[] { forest_prefab, city_prefab, plains_prefab };
         _camera = GetComponent<Camera>();
 
         _grid = GameObject.Find("grid").GetComponent<ChillGrid>();
@@ -49,13 +52,19 @@ public class camera_controller : MonoBehaviour
             var point = ray.GetPoint(distance);
             
             // Snap to grid
-            // var int_snap = _grid.WorldToCell(point);
-            // var grid_pos = _grid.CellToWorld(int_snap);
             var hex_pos = _grid.Global2Hex(new Vector2(point.x,point.z));
-            // print($"chunk : {hex_pos.Item1.x}, {hex_pos.Item1.y}  hex : {hex_pos.Item2.q}, {hex_pos.Item2.r}");
-            var grid_pos = _grid.Hex2Global(hex_pos.Item1, hex_pos.Item2);
-            grid_pos.y = 1;
-            gridCube.transform.position = grid_pos;
+            var grid_pos = _grid.Hex2Global(hex_pos) ;
+            _grid_indicator.transform.position = grid_pos + new Vector3(0,0.5f,0);
+            
+            if (Input.GetMouseButtonDown(0))
+            {
+                var new_hex = Instantiate(hexagon_model, grid_pos, Quaternion.Euler(-90, 0, 0));
+                var cell = new_hex.GetComponent<Cell>();
+                
+
+            }
         }
+
+       
     }
 }
