@@ -10,17 +10,15 @@ public class camera_controller : MonoBehaviour
     private float cameraSpeed = 10f;
     [SerializeField] private GameObject _grid_indicator;
     [SerializeField] private GameObject hexagon_model;
-    // [SerializeField] private GameObject forest_prefab;
-    // [SerializeField] private GameObject city_prefab;
-    // [SerializeField] private GameObject plains_prefab;
-    // private GameObject[] biomes;
+    [SerializeField] private GameObject _stack_obj; // The gameobject with the Stacker class.
+    private Stacker _stacker;
     private Camera _camera;
 
     private ChillGrid _grid;
     // Start is called before the first frame update
     void Start()
     {
-        // biomes = new[] { forest_prefab, city_prefab, plains_prefab };
+        _stacker = _stack_obj.GetComponent<Stacker>();
         _camera = GetComponent<Camera>();
 
         _grid = GameObject.Find("grid").GetComponent<ChillGrid>();
@@ -58,10 +56,12 @@ public class camera_controller : MonoBehaviour
             
             if (Input.GetMouseButtonDown(0))
             {
-                var new_hex = Instantiate(hexagon_model, grid_pos, Quaternion.Euler(-90, 0, 0));
-                var cell = new_hex.GetComponent<Cell>();
-                
-
+                if(_stacker.Pop(out var biome))
+                {
+                    var new_hex = Instantiate(hexagon_model, grid_pos, Quaternion.Euler(-90, 0, 0));
+                    var cell = new_hex.GetComponent<Cell>();
+                    cell.Biome = biome;
+                }
             }
         }
 

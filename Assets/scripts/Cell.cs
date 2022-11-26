@@ -16,26 +16,35 @@ public class Cell : MonoBehaviour
 {
     
     [SerializeField]
-    public Biome biome;
+    private Biome _biome;
+
+    public Biome Biome
+    {
+        set
+        {
+            _biome = value;
+            Rebuild_Mesh();
+        }
+        get => _biome;
+    }
 
     [SerializeField] private GameObject[] prefabs;
     private Hex _hex;
     public void Start()
     {
-        #region set _sides to random biomes.
-        var biomes = Enum.GetValues(typeof(Biome));
-        biome = Enumerable.Repeat(0,1).Select(i =>
-        {
-            var rand = Random.Range(0, biomes.Length);
-            var obj = biomes.GetValue(rand);
-            return (Biome)obj; // gross
-        }).ToArray()[0];
-        #endregion
+        // #region set _sides to random biomes.
+        // var biomes = Enum.GetValues(typeof(Biome));
+        // biome = Enumerable.Repeat(0,1).Select(i =>
+        // {
+        //     var rand = Random.Range(0, biomes.Length);
+        //     var obj = biomes.GetValue(rand);
+        //     return (Biome)obj; // gross
+        // }).ToArray()[0];
+        // #endregion
         
-        Rebuild_Mesh();
+        // Rebuild_Mesh();
     }
-    
-    
+
     // Is temperary. Should not be used in the final game!
     // hex_pos is the position of the hexagon game object. (should be the center of it).
     // private Vector3 GetBiomePos(Vector3 hex_pos, int side)
@@ -60,7 +69,7 @@ public class Cell : MonoBehaviour
         // {
             // var biome_pos = GetBiomePos(transform.position, i);
         var biome_pos = transform.position + new Vector3 { y = 0.1f + 0.25f/2 };
-        int index = Convert.ToInt32(biome);
+        int index = Convert.ToInt32(_biome);
         var forest = Instantiate(prefabs[index], biome_pos, Quaternion.Euler(-90, 0, 0));
         forest.layer = gameObject.layer;
         forest.transform.parent = transform;

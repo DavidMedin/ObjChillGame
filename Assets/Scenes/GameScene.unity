@@ -371,7 +371,7 @@ MonoBehaviour:
   hex_cell: {fileID: 5923615767009552192, guid: 2606334684b68cf2881bac2c9c007f58, type: 3}
   target_texture: {fileID: 8400000, guid: 1c0f15005c67fb6c9a8104333cb1c1bc, type: 2}
   _render_size: 400
-  ui_target: {fileID: 0}
+  ui_target: {fileID: 836015389}
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
