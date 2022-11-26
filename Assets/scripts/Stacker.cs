@@ -19,6 +19,8 @@ public class Stacker : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        int layer = LayerMask.NameToLayer("stack");
+        
         target_texture.width = (int)Math.Ceiling(_render_size * 0.3);
         target_texture.height = _render_size;
         
@@ -30,6 +32,7 @@ public class Stacker : MonoBehaviour
         for (int i = 0; i < 5; i++)
         {
             stack[i] = Instantiate(hex_cell,transform.position + new Vector3(0,i*1.25f, 3), Quaternion.Euler(-90+150,0,0));
+            stack[i].layer = layer;
             stack[i].transform.parent = transform;
         }
     }
