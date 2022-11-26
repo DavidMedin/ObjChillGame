@@ -62,6 +62,7 @@ public class Cell : MonoBehaviour
         var biome_pos = transform.position + new Vector3 { y = 0.1f + 0.25f/2 };
         int index = Convert.ToInt32(biome);
         var forest = Instantiate(prefabs[index], biome_pos, Quaternion.Euler(-90, 0, 0));
+        forest.layer = gameObject.layer;
         forest.transform.parent = transform;
         // }
     }
