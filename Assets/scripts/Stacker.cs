@@ -33,7 +33,7 @@ public class Stacker : MonoBehaviour
         Repopulate();
     }
     
-    public bool Repopulate()
+    public void Repopulate()
     {
         // Destroy all that are not destroyed
         for (int i = 0; i < last; i++)
@@ -59,10 +59,7 @@ public class Stacker : MonoBehaviour
                 return (Biome)obj; // gross
             }).ToArray()[0];
         }
-
-
-        return true;
-    }
+        }
 
 
     // Update is called once per frame

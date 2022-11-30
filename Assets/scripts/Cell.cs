@@ -1,14 +1,11 @@
 using System;
-using System.Linq;
-using System.Security.Cryptography;
 using UnityEngine;
-using Random = UnityEngine.Random;
 using DefaultNamespace;
 
 
 public enum Biome
 {
-    forset=0,
+    forest=0,
     town=1,
     plains
 }
@@ -32,17 +29,6 @@ public class Cell : MonoBehaviour
     private Hex _hex;
     public void Start()
     {
-        // #region set _sides to random biomes.
-        // var biomes = Enum.GetValues(typeof(Biome));
-        // biome = Enumerable.Repeat(0,1).Select(i =>
-        // {
-        //     var rand = Random.Range(0, biomes.Length);
-        //     var obj = biomes.GetValue(rand);
-        //     return (Biome)obj; // gross
-        // }).ToArray()[0];
-        // #endregion
-        
-        // Rebuild_Mesh();
     }
 
     // Is temperary. Should not be used in the final game!
@@ -65,14 +51,10 @@ public class Cell : MonoBehaviour
     public void Rebuild_Mesh()
     {
         // requires meshes to make this work.
-        // for(var i=0;i < 6;i++)
-        // {
-            // var biome_pos = GetBiomePos(transform.position, i);
         var biome_pos = transform.position + new Vector3 { y = 0.1f + 0.25f/2 };
         int index = Convert.ToInt32(_biome);
         var forest = Instantiate(prefabs[index], biome_pos, Quaternion.Euler(-90, 0, 0));
         forest.layer = gameObject.layer;
         forest.transform.parent = transform;
-        // }
     }
 }

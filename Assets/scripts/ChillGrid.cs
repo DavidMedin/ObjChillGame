@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using Unity.VisualScripting;
+using JetBrains.Annotations;
 using UnityEngine;
-using Color = UnityEngine.Color;
 
 namespace DefaultNamespace
 {
@@ -13,6 +11,18 @@ namespace DefaultNamespace
         public Vector2Int chunk;
         public int r;
         public int q;
+
+        public void SnapToGrid()
+        {
+            var vec = new Vector2(q, r);
+            var chunk_mount = vec / ChillGrid.ChunkSize;
+            var chunk_int = new Vector2( (int)Math.Floor (chunk_mount.x), (int)Math.Floor(chunk_mount.y));
+            vec -= chunk_int * ChillGrid.ChunkSize;
+            chunk += new Vector2Int((int)chunk_int.x,(int)chunk_int.y);
+            
+            q = (int)vec.x;
+            r = (int)vec.y;
+        }
     }
     
     // An Axial Hexagon grid. (Look at this : https://www.redblobgames.com/grids/hexagons/)
@@ -21,7 +31,7 @@ namespace DefaultNamespace
         [SerializeField] private float _cell_size;
 
         // These are rhombus shaped chunks in the world.
-        private static int _chunk_size = 20;
+        public static int ChunkSize = 20;
         private Dictionary<Vector2Int, GameObject[,]> _chunks;
 
         // Magic, do not ask.
@@ -29,12 +39,13 @@ namespace DefaultNamespace
         private static Vector2 r_basis = new Vector2((float)Math.Sqrt(3)/2, (float)3/2);
 
         public GameObject grid_prefab;
+        public GameObject cell_prefab;
         public Vector3 Hex2Global(Hex hex)
         {
             var new_hex = new Hex
             {
-                q = hex.q + hex.chunk.x * _chunk_size,
-                r = hex.r + hex.chunk.y * _chunk_size
+                q = hex.q + hex.chunk.x * ChunkSize,
+                r = hex.r + hex.chunk.y * ChunkSize
             };
             return new Vector3
             {
@@ -43,6 +54,19 @@ namespace DefaultNamespace
             };
         }
 
+        [CanBeNull]
+        public GameObject Get(Hex hex)
+        {
+            try
+            {
+                return _chunks[hex.chunk][hex.q, hex.r];
+                
+            }
+            catch
+            {
+                return null;
+            }
+        }
         public Hex Global2Hex(Vector2 point)
         {
             var vec2 = new Vector2((float)Math.Sqrt(3)/3 * point.x - (float)1/3 * point.y, (float)2/3 * point.y) / _cell_size;
@@ -50,14 +74,34 @@ namespace DefaultNamespace
             var axial_hex = AxialRound(vec2);
             vec2.x = axial_hex.q;
             vec2.y = axial_hex.r;
-            var chunk = (vec2 / _chunk_size);
+            var chunk = (vec2 / ChunkSize);
             var chunk_i = new Vector2Int((int)Math.Floor(chunk.x), (int)Math.Floor(chunk.y));
-            vec2 -= chunk_i * _chunk_size;
+            vec2 -= chunk_i * ChunkSize;
 
-            // return (chunk_i, new Hex{q=(int)vec2.x,r=(int)vec2.y});
             return new Hex { chunk = chunk_i, q = (int)vec2.x, r = (int)vec2.y };
         }
-        
+
+        public List<Hex> Neighbors(Hex hex)
+        {
+            var list = new List<Hex>
+            {
+                new Hex{q=hex.q+1,r=hex.r,chunk=hex.chunk},
+                new Hex{q=hex.q-1,r=hex.r,chunk=hex.chunk},
+                new Hex{q=hex.q,r=hex.r+1,chunk=hex.chunk},
+                new Hex{q=hex.q,r=hex.r-1,chunk=hex.chunk},
+                new Hex{q=hex.q+1,r=hex.r-1,chunk=hex.chunk},
+                new Hex{q=hex.q-1,r=hex.r+1,chunk=hex.chunk}
+            };
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                var what = list[i];
+                what.SnapToGrid();
+                list[i] = what; // Kill me.
+            }
+
+            return list;
+        }
 
         // Input fractional axial space vector and return a Hex.
         private Hex AxialRound(Vector2 point)
@@ -79,18 +123,17 @@ namespace DefaultNamespace
 
             return new Hex { q = (int)q, r = (int)r };
         }
-        public GameObject CreateHex(Hex hex)
+        public GameObject CreateHex(Hex hex,Biome biome)
         {
             // Add a hexagon to the map.
             var thing = Hex2Global(hex);
-            var game_obj = Instantiate(grid_prefab, thing, Quaternion.Euler(-90,0,0));
+            var game_obj = Instantiate(cell_prefab, thing, Quaternion.Euler(-90,0,0));
 
             GameObject[,] chunk;
             if (!_chunks.ContainsKey(hex.chunk))
             {
                 // Create this boi.
-                print($"Loading new chunk! {hex.chunk.x} {hex.chunk.y}");
-                chunk = new GameObject[_chunk_size,_chunk_size];
+                chunk = new GameObject[ChunkSize,ChunkSize];
                 _chunks[hex.chunk] = chunk;
             }
             else
@@ -100,7 +143,8 @@ namespace DefaultNamespace
             
             // Add the GameObject into this chunk.
             // This will overwrite!
-            chunk[hex.r, hex.q] = game_obj;
+            game_obj.GetComponent<Cell>().Biome = biome;
+            chunk[hex.q, hex.r] = game_obj;
             return game_obj;
         }
         
@@ -108,41 +152,10 @@ namespace DefaultNamespace
         {
             // Create the first chunk.
             _chunks = new Dictionary<Vector2Int, GameObject[,]>();
-            _chunks[new Vector2Int(0,0)] = new GameObject[_chunk_size,_chunk_size];
-            
-            // Create a lot of items in this grid.
-            // const int gen = 20;
-            // for(var x=0; x < gen; x++)
-            // {
-            //     for (var z = 0; z < gen; z++)
-            //     {
-            //         CreateHex(new Vector2Int(0,0), new Hex {r=x, q=z});
-            //     }
-            // }
-            // for(var x=0; x < gen; x++)
-            // {
-            //     for (var z = 0; z < gen; z++)
-            //     {
-            //         var obj = CreateHex(new Vector2Int(1,0), new Hex {r=x, q=z});
-            //         obj.GetComponent<Renderer>().material.SetColor("_Color",Color.blue);
-            //     }
-            // }
-            // for(var x=0; x < gen; x++)
-            // {
-            //     for (var z = 0; z < gen; z++)
-            //     {
-            //         var obj = CreateHex(new Vector2Int(0,1), new Hex {r=x, q=z});
-            //         obj.GetComponent<Renderer>().material.SetColor("_Color",Color.red);
-            //     }
-            // }
-            // for(var x=0; x < gen; x++)
-            // {
-            //     for (var z = 0; z < gen; z++)
-            //     {
-            //         var obj = CreateHex(new Vector2Int(1,1), new Hex {r=x, q=z});
-            //         obj.GetComponent<Renderer>().material.SetColor("_Color",Color.cyan);
-            //     }
-            // }
+            _chunks[new Vector2Int(0,0)] = new GameObject[ChunkSize,ChunkSize];
+
+
+            CreateHex(new Hex { r = 0, q = 0, chunk = new Vector2Int(0, 0) }, Biome.forest);
         }
     }
 }
