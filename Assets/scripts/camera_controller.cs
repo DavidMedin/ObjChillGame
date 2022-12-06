@@ -45,7 +45,7 @@ public class camera_controller : MonoBehaviour
         var ray = _camera.ScreenPointToRay(Input.mousePosition);
 
         //                     v--v---  I didn't know you could do this.
-        if (plane.Raycast(ray, out var distance))
+        if (plane.Raycast(ray, out var distance) && !PauseMenu.GameIsPaused)
         {
             var point = ray.GetPoint(distance);
 
