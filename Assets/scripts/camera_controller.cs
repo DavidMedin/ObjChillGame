@@ -12,9 +12,18 @@ public class camera_controller : MonoBehaviour
     [SerializeField] private GameObject hexagon_model;
     [SerializeField] private GameObject _stack_obj; // The gameobject with the Stacker class.
     private Stacker _stacker;
+    private Plane _plane;
     private Camera _camera;
 
     private ChillGrid _grid;
+
+    private float _x_mouse_delta = 0;
+
+    private float _x_mouse = 0;
+
+    private bool is_mouse_down = false;
+
+    [SerializeField] private GameObject dumb_indiciator;
     // Start is called before the first frame update
     void Start()
     {
@@ -22,30 +31,45 @@ public class camera_controller : MonoBehaviour
         _camera = GetComponent<Camera>();
 
         _grid = GameObject.Find("grid").GetComponent<ChillGrid>();
+
+        _x_mouse = Input.mousePosition.x;
+        
+        
+        // Mouse support
+        _plane = new Plane(Vector3.up, new Vector3(0, 0, 0));
     }
 
     // Update is called once per frame
     void Update()
     {
-    
+        _x_mouse_delta = Input.mousePosition.x - _x_mouse;
+        _x_mouse = Input.mousePosition.x;
+        
         var vert = Input.GetAxis("Vertical");
         var hor = Input.GetAxis("Horizontal");
-            
+
+        var rot = Mathf.Deg2Rad * transform.rotation.eulerAngles.y;
+
         var diffPos = new Vector3
         { // This is cool.
-            x = hor * cameraSpeed * Time.deltaTime,
-            z = vert * cameraSpeed * Time.deltaTime
-        };
+            x = (float)Math.Sin(rot),
+            z = (float)Math.Cos(rot)
+        } *  vert;
+        var strafe = new Vector3
+        {
+            x = (float)Math.Sin(rot + Mathf.PI/2),
+            z = (float)Math.Cos(rot + Mathf.PI/2)
+        } * hor;
+        diffPos = (diffPos + strafe).normalized * (cameraSpeed * Time.deltaTime);
         
         transform.position += diffPos;
 
-        // Mouse support
-        var plane = new Plane(Vector3.up, new Vector3(0, 0, 0));
 
         var ray = _camera.ScreenPointToRay(Input.mousePosition);
 
+        var is_left_down = false;
         //                     v--v---  I didn't know you could do this.
-        if (plane.Raycast(ray, out var distance) && !PauseMenu.GameIsPaused)
+        if (_plane.Raycast(ray, out var distance) && !PauseMenu.GameIsPaused)
         {
             var point = ray.GetPoint(distance);
 
@@ -55,8 +79,9 @@ public class camera_controller : MonoBehaviour
             var grid_pos = _grid.Hex2Global(hex_pos);
             _grid_indicator.transform.position = grid_pos + new Vector3(0, 0.5f, 0);
 
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButton(0))
             {
+                is_left_down = true;
                 if (_grid.Get(hex_pos) == null) // If there is not a cell already here.
                 {
                     var neighbors = _grid.Neighbors(hex_pos);
@@ -75,6 +100,28 @@ public class camera_controller : MonoBehaviour
                 }
             }
 
+        }
+
+        if (!is_left_down && Input.GetMouseButtonDown(1))
+        {
+            is_mouse_down = true;
+        }
+
+        if (is_mouse_down)
+        {
+            var camera_ray = _camera.ViewportPointToRay(new Vector3(0.5f,0.5f, 0));
+            if (_plane.Raycast(camera_ray, out var ray_distance))
+            {
+                var point = camera_ray.GetPoint(ray_distance);
+                Debug.DrawRay(camera_ray.direction,point,Color.yellow);
+                dumb_indiciator.transform.position = point;
+                transform.RotateAround(point,Vector3.up,Mathf.Deg2Rad * _x_mouse_delta * 5);
+            }
+            // transform.Rotate();
+        }
+        if (Input.GetMouseButtonUp(1))
+        {
+            is_mouse_down = false;
         }
     }
 }
