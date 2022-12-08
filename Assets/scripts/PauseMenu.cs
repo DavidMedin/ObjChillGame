@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,6 +9,14 @@ public class PauseMenu : MonoBehaviour
     public static bool GameIsPaused = false;
 
     public GameObject pauseMenu;
+
+    private void Start()
+    {
+        // If this is not called in start, going to
+        // the menu and back to the game doesn't
+        // reset `GameIsPaused`.
+        Resume();
+    }
 
     void Update ()
     {
