@@ -65,9 +65,8 @@ public class Cell : MonoBehaviour
     }
 
     [SerializeField] private GameObject[] prefabs;
-    private Hex _hex;
-
-
+    public Hex hex;
+ 
     [Button]
     void AddTroop(uint count=1)
     {

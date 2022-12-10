@@ -151,7 +151,9 @@ namespace DefaultNamespace
             
             // Add the GameObject into this chunk.
             // This will overwrite!
-            game_obj.GetComponent<Cell>().Biome = biome;
+            var cell = game_obj.GetComponent<Cell>();
+            cell.Biome = biome;
+            cell.hex = hex;
             chunk[hex.q, hex.r] = game_obj;
             return game_obj;
         }
@@ -163,7 +165,8 @@ namespace DefaultNamespace
             _chunks[new Vector2Int(0,0)] = new GameObject[ChunkSize,ChunkSize];
 
 
-            CreateHex(new Hex { r = 0, q = 0, chunk = new Vector2Int(0, 0) }, Biome.castle);
+            var start = CreateHex(new Hex { r = 0, q = 0, chunk = new Vector2Int(0, 0) }, Biome.castle);
+            start.GetComponent<Cell>().Troop_Count = 20;
         }
     }
 }

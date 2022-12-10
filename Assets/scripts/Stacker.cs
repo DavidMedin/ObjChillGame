@@ -54,12 +54,6 @@ public class Stacker : MonoBehaviour
             
             var biomes = Enum.GetValues(typeof(Biome));
             stack[i].GetComponent<Cell>().Biome = Cell.GetRandomBiome();
-            //     Enumerable.Repeat(0,1).Select(i =>
-            // {
-            //     var rand = Random.Range(0, biomes.Length);
-            //     var obj = biomes.GetValue(rand);
-            //     return (Biome)obj; // gross
-            // }).First();
 
             stack[i].transform.rotation = Quaternion.Euler(-90 + 150 + 180, 0, 0);
         }
