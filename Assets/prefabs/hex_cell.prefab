@@ -62,7 +62,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: f0814bfc7293df62ab24a330c9577971, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -96,8 +96,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 608e305f0ee148948f913af81dee7a36, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sides: 
+  _biome: 0
+  _prefab_troop_indic: {fileID: 7862796151726064265, guid: 68acd7225915550578f5dea53d113564, type: 3}
   prefabs:
   - {fileID: 3059994079727460519, guid: 4324cb43ae12474288d2e34dbd7273c5, type: 3}
   - {fileID: 3059994079727460519, guid: c04fe7647e0520a5b8564180f84f64bf, type: 3}
   - {fileID: 3059994079727460519, guid: cb4086bed7ae976b89aee5a8010adaf2, type: 3}
+  - {fileID: 8146107550330566890, guid: fc99f099e56498bfa9a9d1deeebe0ab0, type: 3}

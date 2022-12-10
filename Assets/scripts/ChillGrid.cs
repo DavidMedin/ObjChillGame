@@ -23,6 +23,15 @@ namespace DefaultNamespace
             q = (int)vec.x;
             r = (int)vec.y;
         }
+
+        public static bool operator ==(Hex a, Hex b)
+        {
+            return a.chunk.x == b.chunk.x && a.chunk.y == b.chunk.y && a.r == b.r && a.q == b.q;
+        }
+        public static bool operator !=(Hex a, Hex b)
+        {
+            return a.chunk.x != b.chunk.x || a.chunk.y != b.chunk.y || a.r != b.r || a.q != b.q;
+        }
     }
     
     // An Axial Hexagon grid. (Look at this : https://www.redblobgames.com/grids/hexagons/)
@@ -38,7 +47,6 @@ namespace DefaultNamespace
         private static Vector2 q_basis = new Vector2((float)Math.Sqrt(3), 0);
         private static Vector2 r_basis = new Vector2((float)Math.Sqrt(3)/2, (float)3/2);
 
-        public GameObject grid_prefab;
         public GameObject cell_prefab;
         public Vector3 Hex2Global(Hex hex)
         {
@@ -155,7 +163,7 @@ namespace DefaultNamespace
             _chunks[new Vector2Int(0,0)] = new GameObject[ChunkSize,ChunkSize];
 
 
-            CreateHex(new Hex { r = 0, q = 0, chunk = new Vector2Int(0, 0) }, Biome.forest);
+            CreateHex(new Hex { r = 0, q = 0, chunk = new Vector2Int(0, 0) }, Biome.castle);
         }
     }
 }

@@ -47,17 +47,21 @@ public class Stacker : MonoBehaviour
         // Create new objects to stack
         for (int i = 0; i < 5; i++)
         {
-            stack[i] = Instantiate(hex_cell,transform.position + new Vector3(0,i*1.25f, 3), Quaternion.Euler(-90+150,0,0));
+            stack[i] = Instantiate(hex_cell,transform.position + new Vector3(0,i*1.25f, 3), Quaternion.Euler(-90,0,0));
             stack[i].layer = layer;
             stack[i].transform.parent = transform;
             
+            
             var biomes = Enum.GetValues(typeof(Biome));
-            stack[i].GetComponent<Cell>().Biome = Enumerable.Repeat(0,1).Select(i =>
-            {
-                var rand = Random.Range(0, biomes.Length);
-                var obj = biomes.GetValue(rand);
-                return (Biome)obj; // gross
-            }).ToArray()[0];
+            stack[i].GetComponent<Cell>().Biome = Cell.GetRandomBiome();
+            //     Enumerable.Repeat(0,1).Select(i =>
+            // {
+            //     var rand = Random.Range(0, biomes.Length);
+            //     var obj = biomes.GetValue(rand);
+            //     return (Biome)obj; // gross
+            // }).First();
+
+            stack[i].transform.rotation = Quaternion.Euler(-90 + 150 + 180, 0, 0);
         }
         }
 
