@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using DefaultNamespace;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -23,6 +24,8 @@ public class camera_controller : MonoBehaviour
     
     // Troop Movement State
     private GameObject _troop_source;
+    private int _troop_split;
+    private int _max_troops;
 
     // Mouse Input State
     private float _x_mouse_delta = 0;
@@ -71,7 +74,7 @@ public class camera_controller : MonoBehaviour
         }
     }
 
-    void MoveTroops(GameObject source)
+    void MoveTroops(GameObject source, bool divide)
     {
         if (_troop_source != null)
         {
@@ -80,9 +83,18 @@ public class camera_controller : MonoBehaviour
             var dest_cell = source.GetComponent<Cell>();
             var src_cell = _troop_source.GetComponent<Cell>();
             if (dest_cell.hex == src_cell.hex) return; // Don't move from to same place.
-            dest_cell.Troop_Count += src_cell.Troop_Count;
-            src_cell.Troop_Count = 0;
+
+            var move_count = _troop_split == 0 ? src_cell.Troop_Count : (uint)_troop_split;
+            Assert.IsTrue(move_count <= src_cell.Troop_Count && move_count > 0); // Just checking.
+            dest_cell.Troop_Count += move_count;
+            src_cell.Troop_Count -= move_count;
             _troop_source = null;
+            _troop_split = 0;
+            
+            // Disable the splitting textbox.
+            var indic = src_cell.Troop_Indic;
+            var text_obj = indic.transform.GetChild(2);
+            text_obj.gameObject.SetActive(false);
         }
         else
         {
@@ -91,11 +103,24 @@ public class camera_controller : MonoBehaviour
             if (pointed_cell.Troop_Count > 0)
             {
                 _troop_source = source;
+                if (divide)
+                {
+                    //                Bruh
+                    _troop_split = (int)Math.Ceiling(pointed_cell.Troop_Count / 2.0f);
+                    _max_troops = (int)pointed_cell.Troop_Count;
+                    
+                    // Enable the splitting textbox.
+                    var indic = pointed_cell.Troop_Indic;
+                    var text_obj = indic.transform.GetChild(2);
+                    text_obj.gameObject.SetActive(true);
+                    var textbox = text_obj.gameObject.GetComponent<TMP_Text>();
+                    textbox.text = _troop_split.ToString();
+                }
             }
         }
     }
 
-    void DoMousePointing(bool is_left_down)
+    void DoMousePointing(bool is_left_down, bool is_right_down)
     {
         var ray = _camera.ScreenPointToRay(Input.mousePosition);
         //                     v--v---  I didn't know you could do this.
@@ -112,7 +137,7 @@ public class camera_controller : MonoBehaviour
         // highlight the pointed at cell
         HighlightCell(hex_pos);
 
-        if (is_left_down == false) return; // VERY IMPORTANT!
+        if (is_left_down == false && is_right_down == false) return; // VERY IMPORTANT!
         // Everything past this is if the left moues button has just been clicked.
         
         // Potentially get the GameObject the cursor is pointing at.
@@ -121,10 +146,13 @@ public class camera_controller : MonoBehaviour
         // If it pointed at something, (and left click)
         if (pointed_obj != null)
         {
-            MoveTroops(pointed_obj);
+            MoveTroops(pointed_obj, is_right_down);
             return;
         }
 
+        // Now, we don't care about the right mouse button, return if it is down.
+        if (is_left_down == false || is_right_down == true) return;
+        
         // If there is not a cell already here.
         // Create a new cell!
         
@@ -174,13 +202,43 @@ public class camera_controller : MonoBehaviour
             transform.position += diffPos;
 
             var is_left_down = Input.GetMouseButtonDown(0);
-
-            DoMousePointing(is_left_down);
-
-            if (!is_left_down && Input.GetMouseButtonDown(1))
+            var is_right_down = Input.GetMouseButtonDown(1);
+            DoMousePointing(is_left_down,is_right_down);
+            
+            
+            // Get mouse scroll
+            if (_troop_split != 0)
             {
+                // If we are splitting the troop count. 
+                // troop count is not zero only when we are splitting the troops.
+                var scroll = (int)Math.Round(Input.mouseScrollDelta.y,MidpointRounding.AwayFromZero); // Rounds.
+                // So we don't GetComponent twice every frame.
+                if (scroll != 0)
+                {
+                    _troop_split += scroll;
+                    // Constrain _troop_split to 0 < _troop_split <= _max_troops
+                    
+                    // Hush
+                    try
+                    {
+                        _troop_split = Math.Clamp(1, _troop_split, _max_troops);
+                    }catch{}
+
+                    // Update the text box for the split
+                    var cell = _troop_source.GetComponent<Cell>();
+                    var indic = cell.Troop_Indic;
+                    var textbox = indic.transform.GetChild(2).gameObject.GetComponent<TMP_Text>();
+                    textbox.text = _troop_split.ToString();
+                }
+            }
+            
+            if (!is_left_down &&  is_right_down && _troop_split == 0)
+            {
+                // This is used to cancel selections!
+                
                 // Only runs on the first frame the right mouse button is down!
                 _troop_source = null;
+                _troop_split = 0;
             }
 
             if (!is_left_down && Input.GetMouseButton(1))

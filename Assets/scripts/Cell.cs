@@ -25,6 +25,10 @@ public class Cell : MonoBehaviour
     [SerializeField] private GameObject _prefab_troop_indic;
     private uint _troop_count = 0;
     private GameObject _troop_indic;
+    public GameObject Troop_Indic
+    {
+        get => _troop_indic;
+    }
     public uint Troop_Count
     {
         set
