@@ -76,20 +76,26 @@ public class camera_controller : MonoBehaviour
 
     void MoveTroops(GameObject source, bool divide)
     {
-        if (_troop_source != null)
+        var pointed_cell = source.GetComponent<Cell>();
+        
+        if (_troop_source != null && !divide) // If a cell is selected, and left click is pressed.
         {
-            // Move the troops from _troop_source.                            
+            // Move the troops from _troop_source.
             // Treat source like dest.
-            var dest_cell = source.GetComponent<Cell>();
             var src_cell = _troop_source.GetComponent<Cell>();
-            if (dest_cell.hex == src_cell.hex) return; // Don't move from to same place.
+            if (pointed_cell.hex == src_cell.hex) return; // Don't move from to same place.
+            if (!_grid.Neighbors(src_cell.hex).Contains(pointed_cell.hex)) return; // Return if it is not a neighbor of src.
 
             var move_count = _troop_split == 0 ? src_cell.Troop_Count : (uint)_troop_split;
             Assert.IsTrue(move_count <= src_cell.Troop_Count && move_count > 0); // Just checking.
-            dest_cell.Troop_Count += move_count;
+            pointed_cell.Troop_Count += move_count;
             src_cell.Troop_Count -= move_count;
             _troop_source = null;
             _troop_split = 0;
+            
+            // Prevent future moving this turn
+            src_cell.has_moved = true;
+            pointed_cell.has_moved = true;
             
             // Disable the splitting textbox.
             var indic = src_cell.Troop_Indic;
@@ -98,14 +104,15 @@ public class camera_controller : MonoBehaviour
         }
         else
         {
+            if (pointed_cell.has_moved) return; // Don't move these troops, they're tired!
+            
             // There is already a cell, try to move troops!
-            var pointed_cell = source.GetComponent<Cell>();
             if (pointed_cell.Troop_Count > 0)
             {
                 _troop_source = source;
                 if (divide)
                 {
-                    //                Bruh
+                    if (pointed_cell.hex.IsOrigin() && pointed_cell.Troop_Count == 1) return;
                     _troop_split = (int)Math.Ceiling(pointed_cell.Troop_Count / 2.0f);
                     _max_troops = (int)pointed_cell.Troop_Count;
                     
@@ -115,7 +122,20 @@ public class camera_controller : MonoBehaviour
                     text_obj.gameObject.SetActive(true);
                     var textbox = text_obj.gameObject.GetComponent<TMP_Text>();
                     textbox.text = _troop_split.ToString();
+                    
                 }
+                else
+                {
+                    // We are moving all of the troops.
+                    // It is not okay to move all troops from the Castle!
+                    if (pointed_cell.hex.IsOrigin())
+                    {
+                        // Because this is the main state of what action we are doing, make it null.
+                        _troop_source = null;
+                    }
+                }
+                
+                
             }
         }
     }
@@ -203,7 +223,6 @@ public class camera_controller : MonoBehaviour
 
             var is_left_down = Input.GetMouseButtonDown(0);
             var is_right_down = Input.GetMouseButtonDown(1);
-            DoMousePointing(is_left_down,is_right_down);
             
             
             // Get mouse scroll
@@ -221,7 +240,7 @@ public class camera_controller : MonoBehaviour
                     // Hush
                     try
                     {
-                        _troop_split = Math.Clamp(1, _troop_split, _max_troops);
+                        _troop_split = Math.Clamp(_troop_split,1, _max_troops-1);
                     }catch{}
 
                     // Update the text box for the split
@@ -232,11 +251,19 @@ public class camera_controller : MonoBehaviour
                 }
             }
             
-            if (!is_left_down &&  is_right_down && _troop_split == 0)
+            if (!is_left_down &&  is_right_down)
             {
                 // This is used to cancel selections!
-                
                 // Only runs on the first frame the right mouse button is down!
+
+                // Disable the splitting textbox.
+                if (_troop_source != null)
+                {
+                    var indic = _troop_source.GetComponent<Cell>().Troop_Indic;
+                    var text_obj = indic.transform.GetChild(2);
+                    text_obj.gameObject.SetActive(false);
+                }
+                
                 _troop_source = null;
                 _troop_split = 0;
             }
@@ -250,6 +277,8 @@ public class camera_controller : MonoBehaviour
                     transform.RotateAround(point, Vector3.up, Mathf.Deg2Rad * _x_mouse_delta * 5);
                 }
             }
+
+            DoMousePointing(is_left_down,is_right_down);
 
         }
         

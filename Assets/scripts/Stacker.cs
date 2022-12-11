@@ -1,11 +1,8 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using Unity.VisualScripting;
+using DefaultNamespace;
 using UnityEngine;
 using UnityEngine.UI;
-using Random = UnityEngine.Random;
+
 
 public class Stacker : MonoBehaviour
 {
@@ -49,15 +46,16 @@ public class Stacker : MonoBehaviour
         {
             stack[i] = Instantiate(hex_cell,transform.position + new Vector3(0,i*1.25f, 3), Quaternion.Euler(-90,0,0));
             stack[i].layer = layer;
-            stack[i].transform.parent = transform;
-            
-            
-            var biomes = Enum.GetValues(typeof(Biome));
-            stack[i].GetComponent<Cell>().Biome = Cell.GetRandomBiome();
 
+            
+            stack[i].transform.parent = transform;
+
+            stack[i].GetComponent<Cell>().Biome = Cell.GetRandomBiome(); 
+            ObjectMagic.SetLayerRecursively(stack[i],layer);
+            
             stack[i].transform.rotation = Quaternion.Euler(-90 + 150 + 180, 0, 0);
         }
-        }
+    }
 
 
     // Update is called once per frame

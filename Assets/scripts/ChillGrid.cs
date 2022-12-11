@@ -24,6 +24,11 @@ namespace DefaultNamespace
             r = (int)vec.y;
         }
 
+        public bool IsOrigin()
+        {
+            return this == new Hex { r = 0, q = 0, chunk = new Vector2Int(0, 0) };
+        }
+
         public static bool operator ==(Hex a, Hex b)
         {
             return a.chunk.x == b.chunk.x && a.chunk.y == b.chunk.y && a.r == b.r && a.q == b.q;

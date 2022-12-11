@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using DefaultNamespace;
 using EasyButtons;
@@ -18,11 +19,20 @@ public enum Biome
 
 public class Cell : MonoBehaviour
 {
-    
+    private static List<Cell> _all_cells = new List<Cell>();
+
+    public static List<Cell> All_Cells
+    {
+        get => _all_cells;
+    }
+
     [SerializeField]
     private Biome _biome;
 
     [SerializeField] private GameObject _prefab_troop_indic;
+
+    // Troop state
+    public bool has_moved=false;
     private uint _troop_count = 0;
     private GameObject _troop_indic;
     public GameObject Troop_Indic
@@ -70,15 +80,19 @@ public class Cell : MonoBehaviour
 
     [SerializeField] private GameObject[] prefabs;
     public Hex hex;
- 
+    
+    
     [Button]
     void AddTroop(uint count=1)
     {
         Troop_Count = count;
     }
+
+
     
     public void Start()
     {
+        _all_cells.Add(this);
     }
 
     // Is temperary. Should not be used in the final game!
@@ -101,9 +115,9 @@ public class Cell : MonoBehaviour
     public void Rebuild_Mesh()
     {
         // requires meshes to make this work.
-        var biome_pos = transform.position + new Vector3 { y = 0.1f + 0.25f/2 };
+        var biome_pos = transform.position + new Vector3 { y = 0.1f};
         int index = Convert.ToInt32(_biome);
-        var forest = Instantiate(prefabs[index], biome_pos, Quaternion.Euler(-90, 0, 0));
+        var forest = Instantiate(prefabs[index], biome_pos, Quaternion.identity);
         forest.layer = gameObject.layer;
         forest.transform.parent = transform;
     }

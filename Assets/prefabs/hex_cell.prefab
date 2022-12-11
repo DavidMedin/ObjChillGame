@@ -99,7 +99,7 @@ MonoBehaviour:
   _biome: 0
   _prefab_troop_indic: {fileID: 7862796151726064265, guid: 68acd7225915550578f5dea53d113564, type: 3}
   prefabs:
-  - {fileID: 3059994079727460519, guid: 4324cb43ae12474288d2e34dbd7273c5, type: 3}
+  - {fileID: 2614658704470598710, guid: 79d434063060811e493d0c699bf33bf4, type: 3}
   - {fileID: 3059994079727460519, guid: c04fe7647e0520a5b8564180f84f64bf, type: 3}
   - {fileID: 3059994079727460519, guid: cb4086bed7ae976b89aee5a8010adaf2, type: 3}
   - {fileID: 8146107550330566890, guid: fc99f099e56498bfa9a9d1deeebe0ab0, type: 3}
