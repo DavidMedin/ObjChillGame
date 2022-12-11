@@ -20,7 +20,9 @@ public enum Biome
 public class Cell : MonoBehaviour
 {
     private static List<Cell> _all_cells = new List<Cell>();
-
+    
+    // How many troops are generated for every castle at the beginning of every turn?
+    private const int troops_per_turn = 4;
     public static List<Cell> All_Cells
     {
         get => _all_cells;
@@ -88,7 +90,13 @@ public class Cell : MonoBehaviour
         Troop_Count = count;
     }
 
-
+    // This should be called at the beginning of every frame.
+    //TurnManager.cs should use Cell's All_Cells list to call NewTurn.
+    public void NewTurn()
+    {
+        has_moved = false;
+        if (_biome == Biome.castle && _troop_count > 0) Troop_Count += troops_per_turn;
+    }
     
     public void Start()
     {

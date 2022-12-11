@@ -23,7 +23,7 @@ namespace DefaultNamespace
             // Reset the 'has_moved' member of all cells.
             foreach (Cell cell in Cell.All_Cells)
             {
-                cell.has_moved = false;
+                cell.NewTurn();
             }
         }
         
