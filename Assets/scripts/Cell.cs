@@ -70,6 +70,8 @@ public class Cell : MonoBehaviour
         get => _troop_count;
     }
 
+    public ulong owner_id;
+
     public Biome Biome
     {
         set

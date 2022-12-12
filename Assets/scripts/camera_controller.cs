@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using DefaultNamespace;
 using TMPro;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -28,6 +29,7 @@ public class camera_controller : MonoBehaviour
     private int _max_troops;
 
     // Mouse Input State
+    [SerializeField] private float _drag_speed;
     private float _x_mouse_delta = 0;
     private float _x_mouse = 0;
 
@@ -69,7 +71,7 @@ public class camera_controller : MonoBehaviour
                 _selected_obj = mouse_over_object;
                 var renderer = mouse_over_object.GetComponent<Renderer>();
                 _selected_old_material = renderer.material;
-
+    
                 // Set material of cell we are pointing at
                 renderer.material = _selected_material;
             }
@@ -187,8 +189,9 @@ public class camera_controller : MonoBehaviour
 
             if (_stacker.Pop(out var biome))
             {
-                _grid.CreateHex(hex_pos, biome);
-                HighlightCell(hex_pos,ignore_same_cell:true);
+                ObjectMagic.GetPlayerClass().RequestCellServerRpc(hex_pos,biome);
+                // _grid.CreateHex(hex_pos, biome);
+                // HighlightCell(hex_pos,ignore_same_cell:true);
                 break;
             }
         }
@@ -203,8 +206,8 @@ public class camera_controller : MonoBehaviour
 
         if (!PauseMenu.GameIsPaused) // If the game is not paused. Read input and do stuff.
         {
+            // Why?
             var vert = Input.GetAxisRaw("Vertical");
-            // print(Input.GetAxisRaw("Vertical"));
             var hor = Input.GetAxisRaw("Horizontal");
 
             var rot = Mathf.Deg2Rad * transform.rotation.eulerAngles.y;
@@ -277,7 +280,7 @@ public class camera_controller : MonoBehaviour
                 if (_plane.Raycast(camera_ray, out var ray_distance))
                 {
                     var point = camera_ray.GetPoint(ray_distance);
-                    transform.RotateAround(point, Vector3.up, Mathf.Deg2Rad * _x_mouse_delta * 5);
+                    transform.RotateAround(point, Vector3.up, Mathf.Deg2Rad * _x_mouse_delta * _drag_speed);
                 }
             }
 

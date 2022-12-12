@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace DefaultNamespace
 {
 
-    public struct Hex
+    public struct Hex : INetworkSerializable
     {
         public Vector2Int chunk;
         public int r;
@@ -36,6 +37,14 @@ namespace DefaultNamespace
         public static bool operator !=(Hex a, Hex b)
         {
             return a.chunk.x != b.chunk.x || a.chunk.y != b.chunk.y || a.r != b.r || a.q != b.q;
+        }
+
+        // To send over network.
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref chunk);
+            serializer.SerializeValue(ref r);
+            serializer.SerializeValue(ref q);
         }
     }
     
@@ -136,7 +145,7 @@ namespace DefaultNamespace
 
             return new Hex { q = (int)q, r = (int)r };
         }
-        public GameObject CreateHex(Hex hex,Biome biome)
+        public GameObject CreateHex(Hex hex,Biome biome,ulong client_id)
         {
             // Add a hexagon to the map.
             var thing = Hex2Global(hex);
@@ -159,19 +168,30 @@ namespace DefaultNamespace
             var cell = game_obj.GetComponent<Cell>();
             cell.Biome = biome;
             cell.hex = hex;
+            cell.owner_id = client_id;
             chunk[hex.q, hex.r] = game_obj;
             return game_obj;
         }
-        
-        private void Start()
+
+        private void Awake()
         {
-            // Create the first chunk.
             _chunks = new Dictionary<Vector2Int, GameObject[,]>();
             _chunks[new Vector2Int(0,0)] = new GameObject[ChunkSize,ChunkSize];
 
+        }
 
-            var start = CreateHex(new Hex { r = 0, q = 0, chunk = new Vector2Int(0, 0) }, Biome.castle);
-            start.GetComponent<Cell>().Troop_Count = 20;
+        private void Start()
+        {
+            // Create the first chunk.
+
+
+            // var start = CreateHex(new Hex { r = 0, q = 0, chunk = new Vector2Int(0, 0) }, Biome.castle);
+            // start.GetComponent<Cell>().Troop_Count = 20;
+            //
+            // var enemy_hex = new Hex { q = 0, r = (int)castle_distance, chunk = new Vector2Int(0, 0) };
+            // enemy_hex.SnapToGrid(); // I love you, SnapToGrid.
+            // var enemy_obj = CreateHex(enemy_hex, Biome.castle);
+            // enemy_obj.GetComponent<Cell>().Troop_Count = 20;
         }
     }
 }

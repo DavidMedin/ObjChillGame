@@ -1640,6 +1640,7 @@ MonoBehaviour:
   cameraSpeed: 10
   _stack_obj: {fileID: 485260812}
   _selected_material: {fileID: 2100000, guid: a085be04093ebfdb6a7812a384e5787d, type: 2}
+  _drag_speed: 9
 --- !u!114 &963194230
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2373,7 +2374,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1325575319
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2970,6 +2971,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _cell_size: 1
+  castle_distance: 20
   cell_prefab: {fileID: 5923615767009552192, guid: 2606334684b68cf2881bac2c9c007f58, type: 3}
 --- !u!224 &1438745074
 RectTransform:
