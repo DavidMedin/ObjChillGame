@@ -1,5 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
+using Unity.Netcode;
+using Unity.Netcode.Transports.UTP;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class ConnectMenu : MonoBehaviour
@@ -7,6 +11,8 @@ public class ConnectMenu : MonoBehaviour
     static bool ConnMenuIsOpen = false;
 
     public GameObject connectMenu;
+    public GameObject try_connect_menu;
+    public GameObject ip_text_box;
 
     private string IPinput;
 
@@ -33,6 +39,16 @@ public class ConnectMenu : MonoBehaviour
         connectMenu.SetActive(true);
         Time.timeScale = 0f;
         ConnMenuIsOpen = true;
+    }
+
+    public void TryConnectToServer()
+    {
+        try_connect_menu.SetActive(true);
+        
+        // Get the user's string input.
+        var address = ip_text_box.GetComponent<TMP_InputField>().text;
+        NetworkManager.Singleton.GetComponent<UnityTransport>().ConnectionData.Address = address.Trim();
+        NetworkManager.Singleton.StartClient();
     }
     //closes connect menu
     public void CloseConnMenu()

@@ -43,6 +43,8 @@ public class camera_controller : MonoBehaviour
         
         // Mouse support
         _plane = new Plane(Vector3.up, new Vector3(0, 0, 0));
+
+        Input.ResetInputAxes();
     }
     
     void HighlightCell(Hex hex,bool ignore_same_cell=false)
@@ -201,8 +203,9 @@ public class camera_controller : MonoBehaviour
 
         if (!PauseMenu.GameIsPaused) // If the game is not paused. Read input and do stuff.
         {
-            var vert = Input.GetAxis("Vertical");
-            var hor = Input.GetAxis("Horizontal");
+            var vert = Input.GetAxisRaw("Vertical");
+            // print(Input.GetAxisRaw("Vertical"));
+            var hor = Input.GetAxisRaw("Horizontal");
 
             var rot = Mathf.Deg2Rad * transform.rotation.eulerAngles.y;
 
@@ -217,10 +220,10 @@ public class camera_controller : MonoBehaviour
                 x = (float)Math.Sin(rot + Mathf.PI / 2),
                 z = (float)Math.Cos(rot + Mathf.PI / 2)
             } * hor;
-            diffPos = (diffPos + strafe).normalized * (cameraSpeed * Time.deltaTime);
-
+            diffPos = (diffPos + strafe).normalized * (cameraSpeed * Time.unscaledDeltaTime);
+            // print(Time.unscaledDeltaTime);
             transform.position += diffPos;
-
+            
             var is_left_down = Input.GetMouseButtonDown(0);
             var is_right_down = Input.GetMouseButtonDown(1);
             
