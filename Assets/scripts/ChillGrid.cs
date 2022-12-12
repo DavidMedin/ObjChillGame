@@ -145,7 +145,7 @@ namespace DefaultNamespace
 
             return new Hex { q = (int)q, r = (int)r };
         }
-        public GameObject CreateHex(Hex hex,Biome biome,ulong client_id)
+        public GameObject CreateHex(Hex hex,Biome biome,ulong client_id, int troop_count=0)
         {
             // Add a hexagon to the map.
             var thing = Hex2Global(hex);
@@ -169,6 +169,7 @@ namespace DefaultNamespace
             cell.Biome = biome;
             cell.hex = hex;
             cell.owner_id = client_id;
+            cell.Troop_Count = (uint)troop_count;
             chunk[hex.q, hex.r] = game_obj;
             return game_obj;
         }

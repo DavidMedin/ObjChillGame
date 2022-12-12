@@ -29,13 +29,16 @@ namespace DefaultNamespace
                     TargetClientIds = new ulong[]{serverRpcParams.Receive.SenderClientId}
                 }
             };
-            PlaceCellClientRpc(new Hex{r=0,q=0,chunk=new Vector2Int(0,0)} , Biome.castle,serverRpcParams.Receive.SenderClientId,clientRpcParams);
+            PlaceCellClientRpc(new Hex{r=0,q=0,chunk=new Vector2Int(0,0)} , Biome.castle,serverRpcParams.Receive.SenderClientId,20,clientRpcParams);
             
             var player_two_hex = new Hex { r = 0, q = (int)castle_distance, chunk = new Vector2Int(0, 0) };
             player_two_hex.SnapToGrid();
-            PlaceCellClientRpc( player_two_hex, Biome.castle,serverRpcParams.Receive.SenderClientId,clientRpcParams);
+            PlaceCellClientRpc( player_two_hex, Biome.castle,serverRpcParams.Receive.SenderClientId,20,clientRpcParams);
         }
         
+        
+        
+        #region Place Cells
         [ServerRpc]
         public void RequestCellServerRpc(Hex hex,Biome biome,ServerRpcParams serverRpcParams = default)
         {
@@ -51,12 +54,14 @@ namespace DefaultNamespace
         }
         
         [ClientRpc]
-        public void PlaceCellClientRpc(Hex hex, Biome biome, ulong client_id,ClientRpcParams clientRpcParams=default)
+        public void PlaceCellClientRpc(Hex hex, Biome biome, ulong client_id, int troop_count=0,ClientRpcParams clientRpcParams=default)
         {
+            if (!IsOwner) return;
             // Will be executable by the client.
             print($"Server wants cell here ${hex}");
-            _grid.CreateHex(hex, biome,client_id);
+            var obj = _grid.CreateHex(hex, biome,client_id,troop_count);
         }
+        #endregion
 
         public override void OnNetworkSpawn()
         {
