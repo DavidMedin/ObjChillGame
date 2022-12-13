@@ -135,11 +135,37 @@ namespace DefaultNamespace
 
             var dest_obj = _grid.Get(dest);
             var dest_cell = dest_obj.GetComponent<Cell>();
-            
+
             var move_count = split == 0 ? src_cell.Troops : (uint)split;
             Assert.IsTrue(move_count <= src_cell.Troops && move_count > 0); // Just checking.
-            dest_cell.owner_id = OwnerClientId;
-            dest_cell.Troops += move_count;
+            
+            if (dest_cell.is_owned && dest_cell.owner_id != OwnerClientId)
+            {
+                // We are attacking this cell.
+                // var troops_left = Math.Abs(move_count - dest_cell.Troops);
+                if (move_count < dest_cell.Troops)
+                {
+                    dest_cell.owner_id = dest_cell.owner_id;
+                }
+                
+                if (move_count > dest_cell.Troops)
+                {
+                    dest_cell.owner_id = src_cell.owner_id;
+                    dest_cell.Troops = move_count - dest_cell.Troops;
+                }
+                else
+                {
+                    dest_cell.Troops -= move_count;
+                }
+
+            }
+            else
+            {
+                dest_cell.owner_id = OwnerClientId;
+                dest_cell.Troops += move_count;
+
+            }
+
             src_cell.owner_id = OwnerClientId;
             src_cell.Troops -= move_count;
             _cam_ctrl.CancelTroopMove();

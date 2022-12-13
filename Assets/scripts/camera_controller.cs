@@ -15,6 +15,8 @@ public class camera_controller : MonoBehaviour
     private Stacker _stacker;
     private Plane _plane;
     private Camera _camera;
+
+    [SerializeField] private GameObject _grid_obj;
     private ChillGrid _grid;
     
     // Game Input State
@@ -22,7 +24,7 @@ public class camera_controller : MonoBehaviour
 
     // Selection State
     private Hex _last_selected_hex; // The last hex that was moused-over or selected.
-    private GameObject _selected_obj; // Mouse over of selection.
+    // private GameObject _selected_obj; // Mouse over of selection.
     // private Material _selected_old_material; // The old material of _selected_obj.
     // [SerializeField] private Material _selected_material;
     
@@ -37,12 +39,12 @@ public class camera_controller : MonoBehaviour
     private float _x_mouse = 0;
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         _stacker = _stack_obj.GetComponent<Stacker>();
         _camera = GetComponent<Camera>();
 
-        _grid = GameObject.Find("grid").GetComponent<ChillGrid>();
+        _grid = _grid_obj.GetComponent<ChillGrid>();
 
         _x_mouse = Input.mousePosition.x;
         
@@ -54,28 +56,35 @@ public class camera_controller : MonoBehaviour
     
     void HighlightCell(Hex hex,bool ignore_same_cell=false)
     {
-        if (_last_selected_hex == null || _selected_obj == null) return;
+        // if (_last_selected_hex == null || _selected_obj == null) return;
         // In hopes of not running GetComponent every frame.
         if (ignore_same_cell || hex != _last_selected_hex)
         {
+            if (_last_selected_hex != null)
+            {
+                var obj = _grid.Get(_last_selected_hex);
+                if (obj != null)
+                {
+                    obj.GetComponent<Cell>().DisableHighlight();
+                }
+            }
             _last_selected_hex = hex;
             // Restore last selected cell (not this one) their old material.
-            if (_selected_obj != null)
-            {
+            // if (_selected_obj != null)
+            // {
                 // If there was a last object,
                 // var old_renderer = _selected_obj.GetComponent<Renderer>();
                 // old_renderer.material = _selected_obj.GetComponent<Cell>().Target_Material;
-                _selected_obj.GetComponent<Cell>().ToggleHighlight();
-                _selected_obj = null;
-            }                    
+                
+            // }                    
                     
             // Attempt to get the hexagon there.
             GameObject mouse_over_object = _grid.Get(hex);
             if (mouse_over_object != null)
             {
                 // Save state
-                _selected_obj = mouse_over_object;
-                _selected_obj.GetComponent<Cell>().ToggleHighlight();
+                // _selected_obj = mouse_over_object;
+                mouse_over_object.GetComponent<Cell>().EnableHighlight();
                 // var renderer = mouse_over_object.GetComponent<Renderer>();
                 // _selected_old_material = renderer.material;
 
@@ -91,7 +100,8 @@ public class camera_controller : MonoBehaviour
     // over the network.
     public void TryHighlight()
     {
-        HighlightCell(_last_selected_hex, ignore_same_cell: true);
+        if(_last_selected_hex != null)
+            HighlightCell(_last_selected_hex, ignore_same_cell: true);
     }
 
     // Call this to disable the troop movement. Probably will be called when
@@ -107,13 +117,20 @@ public class camera_controller : MonoBehaviour
     {
         var pointed_cell = source.GetComponent<Cell>();
         
+
         if (_troop_source != null && !divide) // If a cell is selected, and left click is pressed.
         {
             // Move the troops from _troop_source.
             // Treat source like dest.
             var src_cell = _troop_source.GetComponent<Cell>();
-            if (pointed_cell.hex == src_cell.hex) return; // Don't move from to same place.
-            if (!_grid.Neighbors(src_cell.hex).Contains(pointed_cell.hex)) return; // Return if it is not a neighbor of src.
+            if (pointed_cell.hex == src_cell.hex) {
+                print("These hexes are the same!");
+                return; // Don't move from to same place.
+            }
+            if (!_grid.Neighbors(src_cell.hex).Contains(pointed_cell.hex)) {
+                print("Can't place hex that isn't a neighbor to something!");
+                return; // Return if it is not a neighbor of src.
+            }
 
             
             ObjectMagic.GetPlayerClass().RequestTroopMoveServerRpc(src_cell.hex, pointed_cell.hex, _troop_split);
@@ -132,15 +149,27 @@ public class camera_controller : MonoBehaviour
         }
         else
         {
-            if (pointed_cell.has_moved) return; // Don't move these troops, they're tired!
+            if (pointed_cell.has_moved) {
+                print("");
+                return; // Don't move these troops, they're tired!
+            }
             
             // There is already a cell, try to move troops!
             if (pointed_cell.Troops > 0)
             {
+                // don't do anything if I don't own this cell.
+                if (pointed_cell.is_owned && pointed_cell.owner_id != NetworkManager.Singleton.LocalClientId)
+                {
+                    return;
+                }
                 _troop_source = source;
                 if (divide)
                 {
-                    if (pointed_cell.hex.IsOrigin() && pointed_cell.Troops == 1) return;
+                    if (pointed_cell.hex.IsCastle() && pointed_cell.Troops == 1)
+                    {
+                        print("Rejecting move troops : is a castle");
+                        return;
+                    }
                     _troop_split = (int)Math.Ceiling(pointed_cell.Troops / 2.0f);
                     _max_troops = (int)pointed_cell.Troops;
                     
@@ -156,8 +185,9 @@ public class camera_controller : MonoBehaviour
                 {
                     // We are moving all of the troops.
                     // It is not okay to move all troops from the Castle!
-                    if (pointed_cell.hex.IsOrigin())
+                    if (pointed_cell.hex.IsCastle())
                     {
+                        print("Rejecting move troops : is a castle");
                         // Because this is the main state of what action we are doing, make it null.
                         _troop_source = null;
                     }
@@ -190,7 +220,7 @@ public class camera_controller : MonoBehaviour
         
         if (is_left_down == false && is_right_down == false) return; // VERY IMPORTANT!
         // Everything past this is if the left moues button has just been clicked.
-        
+
         // Potentially get the GameObject the cursor is pointing at.
         var pointed_obj = _grid.Get(hex_pos);
         

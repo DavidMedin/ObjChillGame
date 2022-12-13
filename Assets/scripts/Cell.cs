@@ -65,6 +65,9 @@ public class Cell : MonoBehaviour
                 var trans = _troop_indic.GetComponent<Transform>();
                 trans.GetChild(1).GetComponent<TMP_Text>().text = _troop_count.ToString();
             }
+            
+            var renderer = GetComponent<Renderer>();
+            renderer.material = Target_Material;
         }
         get => _troop_count;
     }
@@ -85,7 +88,7 @@ public class Cell : MonoBehaviour
     [SerializeField] private GameObject[] prefabs;
     public Hex hex;
 
-    private bool _is_highlighted = false;
+    // private bool _is_highlighted = false;
     [SerializeField] private Material[] materials;
     public Material Target_Material
     {
@@ -102,21 +105,32 @@ public class Cell : MonoBehaviour
         }
     }
 
-    public void ToggleHighlight()
+    public void EnableHighlight(){
+        var renderer = GetComponent<Renderer>();
+        renderer.material = materials[3];
+    }
+
+    public void DisableHighlight()
     {
         var renderer = GetComponent<Renderer>();
-        if (_is_highlighted)
-        {
-            // turn off highlight
-            renderer.material = Target_Material;
-        }else{
-            // turn on highlight    
-            renderer.material = materials[3];
-        }
+        renderer.material = Target_Material;
 
-        _is_highlighted = !_is_highlighted;
     }
-    
+    // public void ToggleHighlight()
+    // {
+    //     var renderer = GetComponent<Renderer>();
+    //     if (_is_highlighted)
+    //     {
+    //         // turn off highlight
+    //         renderer.material = Target_Material;
+    //     }else{
+    //         // turn on highlight    
+    //         renderer.material = materials[3];
+    //     }
+    //
+    //     _is_highlighted = !_is_highlighted;
+    // }
+    //
     // [Button]
     // void AddTroop(uint count=1)
     // {
