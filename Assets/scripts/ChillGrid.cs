@@ -41,11 +41,29 @@ namespace DefaultNamespace
         {
             return a.chunk.x == b.chunk.x && a.chunk.y == b.chunk.y && a.r == b.r && a.q == b.q;
         }
+        
         public static bool operator !=(Hex a, Hex b)
         {
             return a.chunk.x != b.chunk.x || a.chunk.y != b.chunk.y || a.r != b.r || a.q != b.q;
         }
 
+        
+        #region  MAKE WARNINGS GO AWAY
+        //Override Equals() to make the annoying warning go away
+        //      [[[[DO NOT USE]]]
+        public override bool Equals(object obj)
+        {
+            return true;
+        }
+        //Override GetHashCode() to make the annoying warning go away 
+        //      [[[[DO NOT USE]]]
+        public override int GetHashCode()
+        {
+            return 1;
+        }
+        #endregion
+        
+        
         // To send over network.
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
