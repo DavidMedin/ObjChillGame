@@ -103,7 +103,7 @@ MonoBehaviour:
   owner_id: 0
   prefabs:
   - {fileID: 2614658704470598710, guid: 79d434063060811e493d0c699bf33bf4, type: 3}
-  - {fileID: 3059994079727460519, guid: c04fe7647e0520a5b8564180f84f64bf, type: 3}
+  - {fileID: 3138859439272046366, guid: e262ed17d9e38274db80a4bb4f47187b, type: 3}
   - {fileID: 3059994079727460519, guid: cb4086bed7ae976b89aee5a8010adaf2, type: 3}
   - {fileID: 8146107550330566890, guid: fc99f099e56498bfa9a9d1deeebe0ab0, type: 3}
   materials:
