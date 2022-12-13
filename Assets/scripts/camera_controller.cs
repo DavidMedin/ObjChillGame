@@ -24,10 +24,7 @@ public class camera_controller : MonoBehaviour
 
     // Selection State
     private Hex _last_selected_hex; // The last hex that was moused-over or selected.
-    // private GameObject _selected_obj; // Mouse over of selection.
-    // private Material _selected_old_material; // The old material of _selected_obj.
-    // [SerializeField] private Material _selected_material;
-    
+
     // Troop Movement State
     private GameObject _troop_source;
     private int _troop_split;
@@ -56,7 +53,6 @@ public class camera_controller : MonoBehaviour
     
     void HighlightCell(Hex hex,bool ignore_same_cell=false)
     {
-        // if (_last_selected_hex == null || _selected_obj == null) return;
         // In hopes of not running GetComponent every frame.
         if (ignore_same_cell || hex != _last_selected_hex)
         {
@@ -69,27 +65,13 @@ public class camera_controller : MonoBehaviour
                 }
             }
             _last_selected_hex = hex;
-            // Restore last selected cell (not this one) their old material.
-            // if (_selected_obj != null)
-            // {
-                // If there was a last object,
-                // var old_renderer = _selected_obj.GetComponent<Renderer>();
-                // old_renderer.material = _selected_obj.GetComponent<Cell>().Target_Material;
-                
-            // }                    
-                    
+
             // Attempt to get the hexagon there.
             GameObject mouse_over_object = _grid.Get(hex);
             if (mouse_over_object != null)
             {
                 // Save state
-                // _selected_obj = mouse_over_object;
                 mouse_over_object.GetComponent<Cell>().EnableHighlight();
-                // var renderer = mouse_over_object.GetComponent<Renderer>();
-                // _selected_old_material = renderer.material;
-
-                // Set material of cell we are pointing at
-                // renderer.material = _selected_material;
             }
         }
     }
@@ -134,17 +116,6 @@ public class camera_controller : MonoBehaviour
 
             
             ObjectMagic.GetPlayerClass().RequestTroopMoveServerRpc(src_cell.hex, pointed_cell.hex, _troop_split);
-            // var move_count = _troop_split == 0 ? src_cell.Troop_Count : (uint)_troop_split;
-            // Assert.IsTrue(move_count <= src_cell.Troop_Count && move_count > 0); // Just checking.
-            // pointed_cell.Troop_Count += move_count;
-            // src_cell.Troop_Count -= move_count;
-            // _troop_source = null;
-            // _troop_split = 0;
-            //
-            // // Prevent future moving this turn
-            // src_cell.has_moved = true;
-            // pointed_cell.has_moved = true;
-            //
 
         }
         else
@@ -327,8 +298,6 @@ public class camera_controller : MonoBehaviour
                     text_obj.gameObject.SetActive(false);
                 }
                 
-                // _troop_source = null;
-                // _troop_split = 0;
                 CancelTroopMove();
             }
 

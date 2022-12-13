@@ -142,7 +142,7 @@ public class Cell : MonoBehaviour
     public void NewTurn()
     {
         has_moved = false;
-        if (_biome == Biome.castle && _troop_count > 0) Troops += troops_per_turn;
+        if (_troop_count > 0) Troops += troops_per_turn;
     }
     
     public void Start()

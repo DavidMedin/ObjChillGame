@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using EasyButtons;
 using Unity.Netcode;
+using EasyButtons;
 using UnityEngine.SceneManagement;
 
 namespace DefaultNamespace
@@ -18,6 +19,8 @@ namespace DefaultNamespace
         [SerializeField] private GameObject _stacker;
         [SerializeField] private GameObject _endTurnButton;
 
+        [SerializeField] private GameObject win;
+        [SerializeField] private GameObject lose;
         //void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         //{
         //    // _endTurnButton = GameObject.Find("End Turn Button");  
@@ -91,6 +94,34 @@ namespace DefaultNamespace
                 {
                     cell.NewTurn();
                 }
+            }
+        }
+
+        [Button]
+        public void GiveLoss(int p1,int p2)
+        {
+            // if (p1 == 0 || p2 == 0)
+            // {
+            //     if (p2 == 0 && 1 == NetworkManager.LocalClientId)
+            //     {
+            //         // I lost
+            //         lose.SetActive(true);
+            //     }
+            //     else
+            //     {
+            //         // I won
+            //         win.SetActive(true);
+            //     }
+            // }
+            if (0 == NetworkManager.LocalClientId)
+            {
+                // I am player 1
+                if(p1 == 0) lose.SetActive(true);
+                else if(p2 == 0) win.SetActive(true);
+            }else if (1 == NetworkManager.LocalClientId)
+            {
+                if(p1 == 0) win.SetActive(true);
+                if(p2 == 0) lose.SetActive(true);
             }
         }
         

@@ -14,6 +14,7 @@ namespace DefaultNamespace
         private camera_controller _cam_ctrl;
         [SerializeField] private uint castle_distance; // How far away are the enemies apart?
 
+
         // private int whos_turn;
         
         #region Scene Initialization
@@ -142,7 +143,6 @@ namespace DefaultNamespace
             if (dest_cell.is_owned && dest_cell.owner_id != OwnerClientId)
             {
                 // We are attacking this cell.
-                // var troops_left = Math.Abs(move_count - dest_cell.Troops);
                 if (move_count < dest_cell.Troops)
                 {
                     dest_cell.owner_id = dest_cell.owner_id;
@@ -174,6 +174,11 @@ namespace DefaultNamespace
             src_cell.has_moved = true;
             dest_cell.has_moved = true;
             
+            //Check the number of troops on either side.
+            var p1 = GetTroopCount(0);
+            var p2 = GetTroopCount(1);
+            GameObject.Find("net_turn_mngr").GetComponent<TurnManager>().GiveLoss(p1,p2);
+
             // Disable the splitting textbox.
             var indic = src_cell.Troop_Indic;
             var text_obj = indic.transform.GetChild(2);
@@ -183,6 +188,19 @@ namespace DefaultNamespace
         #endregion
 
 
+        private int GetTroopCount(ulong clientID)
+        {
+            var count = 0;
+            foreach (Cell cell in Cell.All_Cells)
+            {
+                if (cell.is_owned && cell.owner_id == clientID)
+                {
+                    count += (int)cell.Troops;
+                }
+            }
+
+            return count;
+        }
         
         public override void OnNetworkSpawn()
         {
