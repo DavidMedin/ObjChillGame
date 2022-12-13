@@ -98,8 +98,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _biome: 0
   _prefab_troop_indic: {fileID: 7862796151726064265, guid: 68acd7225915550578f5dea53d113564, type: 3}
+  has_moved: 0
+  is_owned: 0
+  owner_id: 0
   prefabs:
   - {fileID: 2614658704470598710, guid: 79d434063060811e493d0c699bf33bf4, type: 3}
   - {fileID: 3059994079727460519, guid: c04fe7647e0520a5b8564180f84f64bf, type: 3}
   - {fileID: 3059994079727460519, guid: cb4086bed7ae976b89aee5a8010adaf2, type: 3}
   - {fileID: 8146107550330566890, guid: fc99f099e56498bfa9a9d1deeebe0ab0, type: 3}
+  materials:
+  - {fileID: 2100000, guid: ae721a69cbf870f0899923d1a6e1ac9c, type: 2}
+  - {fileID: 2100000, guid: 5b30f18485e38ba8e8e2b5480c60cf25, type: 2}
+  - {fileID: 2100000, guid: 97803534b7a0770138db9cab760b5a23, type: 2}
+  - {fileID: 2100000, guid: a085be04093ebfdb6a7812a384e5787d, type: 2}

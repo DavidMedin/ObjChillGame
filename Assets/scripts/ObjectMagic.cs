@@ -1,3 +1,4 @@
+using Unity.Netcode;
 using UnityEngine;
 
 namespace DefaultNamespace
@@ -9,8 +10,13 @@ namespace DefaultNamespace
             root.layer = layer;
             foreach (Transform child in root.transform)
             {
-                SetLayerRecursively(child.gameObject,layer);
-            }        
+                SetLayerRecursively(child.gameObject, layer);
+            }
+        }
+
+        public static player GetPlayerClass()
+        {
+            return NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<player>();
         }
     }
 }

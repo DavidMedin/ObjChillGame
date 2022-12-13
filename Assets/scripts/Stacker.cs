@@ -6,26 +6,26 @@ using UnityEngine.UI;
 
 public class Stacker : MonoBehaviour
 {
-    private GameObject[] stack;
-    private int last = 5;
-    [SerializeField] private GameObject hex_cell;
-
-    [SerializeField] private RenderTexture target_texture;
-
-    [SerializeField] private int _render_size;
-
-    [SerializeField] private GameObject ui_target;
+    private Biome[] stack = new Biome[5];
+    private int last = 0;
+    // [SerializeField] private GameObject hex_cell;
+    //
+    // [SerializeField] private RenderTexture target_texture;
+    //
+    // [SerializeField] private int _render_size;
+    //
+    // [SerializeField] private GameObject ui_target;
     // Start is called before the first frame update
     void Start()
     {
         
-        target_texture.width = (int)Math.Ceiling(_render_size * 0.3);
-        target_texture.height = _render_size;
-        
+        // target_texture.width = (int)Math.Ceiling(_render_size * 0.3);
+        // target_texture.height = _render_size;
+        //
         // Do the ui math for me. hahaha
-        ui_target.GetComponent<RawImage>().SetNativeSize();
-        
-        stack = new GameObject[5];
+        // ui_target.GetComponent<RawImage>().SetNativeSize();
+        //
+        // stack = new GameObject[5];
 
         Repopulate();
     }
@@ -33,27 +33,27 @@ public class Stacker : MonoBehaviour
     public void Repopulate()
     {
         // Destroy all that are not destroyed
-        for (int i = 0; i < last; i++)
-        {
-            Destroy(stack[i]);
-        }
-        
+        // for (int i = 0; i < last; i++)
+        // {
+        //     Destroy(stack[i]);
+        // }
+        //
         last = 5;
-        int layer = LayerMask.NameToLayer("stack");
-
-        // Create new objects to stack
+        // int layer = LayerMask.NameToLayer("stack");
+        //
+        // // Create new objects to stack
         for (int i = 0; i < 5; i++)
         {
-            stack[i] = Instantiate(hex_cell,transform.position + new Vector3(0,i*1.25f, 3), Quaternion.Euler(-90,0,0));
-            stack[i].layer = layer;
-
-            
-            stack[i].transform.parent = transform;
-
-            stack[i].GetComponent<Cell>().Biome = Cell.GetRandomBiome(); 
-            ObjectMagic.SetLayerRecursively(stack[i],layer);
-            
-            stack[i].transform.rotation = Quaternion.Euler(-90 + 150 + 180, 0, 0);
+        //     stack[i] = Instantiate(hex_cell,transform.position + new Vector3(0,i*1.25f, 3), Quaternion.Euler(-90,0,0));
+        //     stack[i].layer = layer;
+        //
+        //     
+        //     stack[i].transform.parent = transform;
+        //
+            stack[i] = Cell.GetRandomBiome(); 
+        // ObjectMagic.SetLayerRecursively(stack[i],layer);
+        //     
+        //     stack[i].transform.rotation = Quaternion.Euler(-90 + 150 + 180, 0, 0);
         }
     }
 
@@ -79,10 +79,10 @@ public class Stacker : MonoBehaviour
             biome = 0; // Garbage
             return false;
         }
-        var obj = stack[last-1];
-        biome = obj.GetComponent<Cell>().Biome;
+        biome = stack[last-1];
+        // biome = obj.GetComponent<Cell>().Biome;
         last -= 1;
-        Destroy(obj);
+        // Destroy(biome);
         return true;
     }
 }

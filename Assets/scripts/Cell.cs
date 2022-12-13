@@ -20,7 +20,9 @@ public enum Biome
 public class Cell : MonoBehaviour
 {
     private static List<Cell> _all_cells = new List<Cell>();
-
+    
+    // How many troops are generated for every castle at the beginning of every turn?
+    private const int troops_per_turn = 4;
     public static List<Cell> All_Cells
     {
         get => _all_cells;
@@ -39,7 +41,7 @@ public class Cell : MonoBehaviour
     {
         get => _troop_indic;
     }
-    public uint Troop_Count
+    public uint Troops
     {
         set
         {
@@ -48,25 +50,27 @@ public class Cell : MonoBehaviour
                 Assert.AreEqual(_troop_indic,null);
                 // If there is no troop indicator, create one.
                 _troop_indic = Instantiate(_prefab_troop_indic, transform.position, Quaternion.identity);
+                is_owned = true;
             }else if (value == 0 && _troop_count > 0)
             {
                 // If there was troops, and now there isn't, KILL.
                 Destroy(_troop_indic);
+                is_owned = false;
             }
             _troop_count = value;
 
+            // Modify the text.
             if (_troop_count > 0)
             {
                 var trans = _troop_indic.GetComponent<Transform>();
                 trans.GetChild(1).GetComponent<TMP_Text>().text = _troop_count.ToString();
-                // foreach(var child in trans)
-                // {
-                //     
-                // }
             }
         }
         get => _troop_count;
     }
+
+    public bool is_owned = false;
+    public ulong owner_id; // if is_owned is false, ignore this value.
 
     public Biome Biome
     {
@@ -80,15 +84,52 @@ public class Cell : MonoBehaviour
 
     [SerializeField] private GameObject[] prefabs;
     public Hex hex;
-    
-    
-    [Button]
-    void AddTroop(uint count=1)
+
+    private bool _is_highlighted = false;
+    [SerializeField] private Material[] materials;
+    public Material Target_Material
     {
-        Troop_Count = count;
+        get
+        {
+            if (is_owned)
+            {
+                return materials[owner_id];
+            }
+            else
+            {
+                return materials[2];
+            }
+        }
     }
 
+    public void ToggleHighlight()
+    {
+        var renderer = GetComponent<Renderer>();
+        if (_is_highlighted)
+        {
+            // turn off highlight
+            renderer.material = Target_Material;
+        }else{
+            // turn on highlight    
+            renderer.material = materials[3];
+        }
 
+        _is_highlighted = !_is_highlighted;
+    }
+    
+    // [Button]
+    // void AddTroop(uint count=1)
+    // {
+    //     Troops = count;
+    // }
+
+    // This should be called at the beginning of every frame.
+    //TurnManager.cs should use Cell's All_Cells list to call NewTurn.
+    public void NewTurn()
+    {
+        has_moved = false;
+        if (_biome == Biome.castle && _troop_count > 0) Troops += troops_per_turn;
+    }
     
     public void Start()
     {
