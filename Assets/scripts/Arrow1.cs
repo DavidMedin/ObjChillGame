@@ -9,7 +9,7 @@ public class Arrow1 : MonoBehaviour {
     void Start()
     {
         _players = GameObject.FindGameObjectsWithTag("Player");
-        goTarget = _players[0];
+        goTarget = _players[1];
         
         Vector3 v3Pos = Camera.main.WorldToViewportPoint(goTarget.transform.position);
         transform.position = Camera.main.ViewportToWorldPoint(v3Pos);
