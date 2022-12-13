@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.18028328, g: 0.22571328, b: 0.3069218, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028331, g: 0.2257133, b: 0.3069217, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1038,10 +1038,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fcbd9b983ff83d4deaa2090de8964893, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hex_cell: {fileID: 5923615767009552192, guid: 2606334684b68cf2881bac2c9c007f58, type: 3}
-  target_texture: {fileID: 8400000, guid: 1c0f15005c67fb6c9a8104333cb1c1bc, type: 2}
-  _render_size: 400
-  ui_target: {fileID: 1325575318}
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -3248,6 +3244,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2676291028705756879, guid: 0b078c25882fbb14b82fafdec9f46193, type: 3}
+      propertyPath: m_OpenAtStart
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2676291028705756879, guid: 0b078c25882fbb14b82fafdec9f46193, type: 3}
       propertyPath: m_OpenCloseKeyCode
       value: 9
