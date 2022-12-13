@@ -29,6 +29,7 @@ namespace DefaultNamespace
             
             
             print($"Done loading, I am {OwnerClientId}");
+            GameObject.Find("net_turn_mngr").GetComponent<TurnManager>().OnTurnChange(1,0);
         }
 
         [ServerRpc]
@@ -160,6 +161,7 @@ namespace DefaultNamespace
         public override void OnNetworkSpawn()
         {
             SceneManager.sceneLoaded += OnSceneLoaded; // load it up.
+            //GameObject.Find("net_turn_mngr").GetComponent<TurnManager>().OnTurnChange(1,0);
         }
 
     }
