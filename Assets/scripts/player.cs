@@ -55,7 +55,7 @@ namespace DefaultNamespace
         public void DoneWithInitClientRpc()
         {
             print($"Done init, {OwnerClientId}");
-            GameObject.Find("net_turn_mngr").GetComponent<TurnManager>().OnTurnChange(1,0);
+            //GameObject.Find("net_turn_mngr").GetComponent<TurnManager>().OnTurnChange(1,0);
         }
         #endregion
         

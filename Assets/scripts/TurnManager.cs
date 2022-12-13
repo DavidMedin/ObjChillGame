@@ -44,14 +44,14 @@ namespace DefaultNamespace
         
         public void OnTurnChange(ulong prev, ulong now)
         {
+            // Add troops to enemy castles
+            ResetTurn(now);
             print("got turn change");
             if (NetworkManager.LocalClient.ClientId == now)
             {
                 print("It is my turn");
                 // Show the end turn button
                 _endTurnButton.SetActive(true);
-                // Add troops to my castles
-                ResetTurnForMe();
                 // reset the stack of tiles
                 _stacker.GetComponent<Stacker>().Repopulate();
                 // enable tile placement and troop movement
@@ -81,12 +81,13 @@ namespace DefaultNamespace
         //Yes, I hate this. This should be the Cell class, but in order to be called from
         // a UnityEvent, the function must attached to a GameObject. And I'm not about
         // to make a dummy cell object to sit around.
-        public void ResetTurnForMe()
+        public void ResetTurn(ulong dest)
         {
+            print($"Adding troops to client {dest}");
             // Reset the 'has_moved' member of all cells.
             foreach (Cell cell in Cell.All_Cells)
             {
-                if (cell.is_owned && cell.owner_id == NetworkManager.Singleton.LocalClientId)
+                if (cell.is_owned && cell.owner_id == dest)
                 {
                     cell.NewTurn();
                 }
@@ -115,9 +116,9 @@ namespace DefaultNamespace
         {
             whos_turn.OnValueChanged += OnTurnChange;
             // SceneManager.sceneLoaded += OnSceneLoaded; // load it up.
+            //TurnManager.OnTurnChange(1,0);
 
             print("Done with turn mngr start()");
         }
-
     }
 }

@@ -12,8 +12,10 @@ public class ConnectMenu : MonoBehaviour
 
     public GameObject connectMenu;
     public GameObject try_connect_menu;
+    public GameObject wait_menu;
     public GameObject ip_text_box;
-
+    
+    
     private string IPinput;
 
     // Update is called once per frame
@@ -30,7 +32,17 @@ public class ConnectMenu : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.Return) && ConnMenuIsOpen)
         {
-            connect();
+            TryConnectToServer();
+        }
+
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            OpenConnMenu();
+            TryConnectToServer();
+        }
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+            StartServer();
         }
     }
     //opens connect menu
@@ -39,6 +51,13 @@ public class ConnectMenu : MonoBehaviour
         connectMenu.SetActive(true);
         Time.timeScale = 0f;
         ConnMenuIsOpen = true;
+    }
+    
+    public void StartServer()
+    {
+        wait_menu.SetActive(true);
+        NetworkManager.Singleton.StartHost();
+        print("Starting host");
     }
 
     public void TryConnectToServer()
@@ -62,12 +81,7 @@ public class ConnectMenu : MonoBehaviour
     {
         IPinput = IP;
         Debug.Log(IPinput);
-    }
-    //does funny ip connection thing (Aiden do this)
-    public void connect()
-    {
-        Time.timeScale = 0f;
-    }
+    }   
 }
 
 
