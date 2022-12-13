@@ -4,7 +4,13 @@ using System.Collections;
 public class Arrow : MonoBehaviour {
      
     public GameObject goTarget;
-    
+    private Gameobject _players[];
+
+    void Start()
+    {
+        _players = GameObject.FindGameObjectsWithTag("Player");
+        goTarget = _players[0];
+    }
     
     void Update () {
         PositionArrow();        
@@ -12,6 +18,7 @@ public class Arrow : MonoBehaviour {
      
     void PositionArrow()
     {
+        
         GetComponent<Renderer>().enabled = false;
         
         Vector3 v3Pos = Camera.main.WorldToViewportPoint(goTarget.transform.position);

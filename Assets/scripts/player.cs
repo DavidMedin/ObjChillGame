@@ -9,7 +9,7 @@ namespace DefaultNamespace
     // Where all the network magic happens.
     public class player : NetworkBehaviour
     {
-        
+        private GameObject[] _players; 
         private ChillGrid _grid;
         private camera_controller _cam_ctrl;
         [SerializeField] private uint castle_distance; // How far away are the enemies apart?
@@ -43,11 +43,27 @@ namespace DefaultNamespace
                     TargetClientIds = new ulong[]{OwnerClientId}
                 }
             };
-            PlaceCellClientRpc(new Hex{r=0,q=0,chunk=new Vector2Int(0,0)} , Biome.castle,1,20,clientRpcParams);
+            var player_one_hex = new Hex{r = 0, q = 0, chunk = new Vector2Int(0, 0)};
+            PlaceCellClientRpc(player_one_hex, Biome.castle, 1, 20, clientRpcParams);
             
-            var player_two_hex = new Hex { r = 0, q = (int)castle_distance, chunk = new Vector2Int(0, 0) };
+            var player_two_hex = new Hex{r = 0, q = (int)castle_distance, chunk = new Vector2Int(0, 0)};
             player_two_hex.SnapToGrid();
-            PlaceCellClientRpc( player_two_hex, Biome.castle,0,20,clientRpcParams);
+            PlaceCellClientRpc(player_two_hex, Biome.castle, 0, 20, clientRpcParams);
+            
+            _players = GameObject.FindGameObjectsWithTag("Player");
+            _players[0].transform.position = _grid.Hex2Global(player_one_hex);
+            _players[1].transform.position = _grid.Hex2Global(player_two_hex);
+            
+            /*
+            if (GameObject.ReferenceEquals(gameObject, _players[0]))
+            {
+                
+            }
+            if (GameObject.ReferenceEquals(gameObject, _players[1]))
+            {
+                player.Transform(_grid.HexToGlobal(player_two_hex.hex));
+            }
+            */
             
             DoneWithInitClientRpc();
         }
