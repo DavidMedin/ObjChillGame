@@ -125,6 +125,22 @@ namespace DefaultNamespace
             return list;
         }
 
+        // public bool HasFriendlyNeighbors(Hex hex, ulong clientId)
+        // {
+        //     foreach (var neigh_hex in Neighbors(hex))
+        //     {
+        //         var neigh_obj = Get(neigh_hex);
+        //         if (neigh_obj != null)
+        //         {
+        //             var neigh_cell = neigh_obj.GetComponent<Cell>();
+        //             if (neigh_cell.is_owned && neigh_cell.owner_id != clientId)
+        //             {
+        //                 return false;
+        //             }
+        //         } 
+        //     }
+        // }
+
         // Input fractional axial space vector and return a Hex.
         private Hex AxialRound(Vector2 point)
         {
@@ -169,7 +185,13 @@ namespace DefaultNamespace
             cell.Biome = biome;
             cell.hex = hex;
             cell.owner_id = client_id;
-            cell.Troop_Count = (uint)troop_count;
+            cell.is_owned = troop_count != 0;
+            cell.Troops = (uint)troop_count;
+            
+            // Color the cell good.
+            var cell_render = game_obj.GetComponent<Renderer>();
+            cell_render.material = cell.Target_Material;
+            
             chunk[hex.q, hex.r] = game_obj;
             return game_obj;
         }

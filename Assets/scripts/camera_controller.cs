@@ -16,12 +16,15 @@ public class camera_controller : MonoBehaviour
     private Plane _plane;
     private Camera _camera;
     private ChillGrid _grid;
+    
+    // Game Input State
+    public bool is_enabled = false;
 
     // Selection State
     private Hex _last_selected_hex; // The last hex that was moused-over or selected.
     private GameObject _selected_obj; // Mouse over of selection.
-    private Material _selected_old_material; // The old material of _selected_obj.
-    [SerializeField] private Material _selected_material;
+    // private Material _selected_old_material; // The old material of _selected_obj.
+    // [SerializeField] private Material _selected_material;
     
     // Troop Movement State
     private GameObject _troop_source;
@@ -51,6 +54,7 @@ public class camera_controller : MonoBehaviour
     
     void HighlightCell(Hex hex,bool ignore_same_cell=false)
     {
+        if (_last_selected_hex == null || _selected_obj == null) return;
         // In hopes of not running GetComponent every frame.
         if (ignore_same_cell || hex != _last_selected_hex)
         {
@@ -59,8 +63,10 @@ public class camera_controller : MonoBehaviour
             if (_selected_obj != null)
             {
                 // If there was a last object,
-                var old_renderer = _selected_obj.GetComponent<Renderer>();
-                old_renderer.material = _selected_old_material;
+                // var old_renderer = _selected_obj.GetComponent<Renderer>();
+                // old_renderer.material = _selected_obj.GetComponent<Cell>().Target_Material;
+                _selected_obj.GetComponent<Cell>().ToggleHighlight();
+                _selected_obj = null;
             }                    
                     
             // Attempt to get the hexagon there.
@@ -69,15 +75,34 @@ public class camera_controller : MonoBehaviour
             {
                 // Save state
                 _selected_obj = mouse_over_object;
-                var renderer = mouse_over_object.GetComponent<Renderer>();
-                _selected_old_material = renderer.material;
-    
+                _selected_obj.GetComponent<Cell>().ToggleHighlight();
+                // var renderer = mouse_over_object.GetComponent<Renderer>();
+                // _selected_old_material = renderer.material;
+
                 // Set material of cell we are pointing at
-                renderer.material = _selected_material;
+                // renderer.material = _selected_material;
             }
         }
     }
 
+    // Function that is callable by everyone. It will try to
+    // reevaluate the last selected hex.
+    // This is only useful if the there was a hex placed
+    // over the network.
+    public void TryHighlight()
+    {
+        HighlightCell(_last_selected_hex, ignore_same_cell: true);
+    }
+
+    // Call this to disable the troop movement. Probably will be called when
+    // the server moves the troops.
+    public void CancelTroopMove()
+    {
+        _troop_source = null;
+        _troop_split = 0;
+        
+    }
+    
     void MoveTroops(GameObject source, bool divide)
     {
         var pointed_cell = source.GetComponent<Cell>();
@@ -90,35 +115,34 @@ public class camera_controller : MonoBehaviour
             if (pointed_cell.hex == src_cell.hex) return; // Don't move from to same place.
             if (!_grid.Neighbors(src_cell.hex).Contains(pointed_cell.hex)) return; // Return if it is not a neighbor of src.
 
-            var move_count = _troop_split == 0 ? src_cell.Troop_Count : (uint)_troop_split;
-            Assert.IsTrue(move_count <= src_cell.Troop_Count && move_count > 0); // Just checking.
-            pointed_cell.Troop_Count += move_count;
-            src_cell.Troop_Count -= move_count;
-            _troop_source = null;
-            _troop_split = 0;
             
-            // Prevent future moving this turn
-            src_cell.has_moved = true;
-            pointed_cell.has_moved = true;
-            
-            // Disable the splitting textbox.
-            var indic = src_cell.Troop_Indic;
-            var text_obj = indic.transform.GetChild(2);
-            text_obj.gameObject.SetActive(false);
+            ObjectMagic.GetPlayerClass().RequestTroopMoveServerRpc(src_cell.hex, pointed_cell.hex, _troop_split);
+            // var move_count = _troop_split == 0 ? src_cell.Troop_Count : (uint)_troop_split;
+            // Assert.IsTrue(move_count <= src_cell.Troop_Count && move_count > 0); // Just checking.
+            // pointed_cell.Troop_Count += move_count;
+            // src_cell.Troop_Count -= move_count;
+            // _troop_source = null;
+            // _troop_split = 0;
+            //
+            // // Prevent future moving this turn
+            // src_cell.has_moved = true;
+            // pointed_cell.has_moved = true;
+            //
+
         }
         else
         {
             if (pointed_cell.has_moved) return; // Don't move these troops, they're tired!
             
             // There is already a cell, try to move troops!
-            if (pointed_cell.Troop_Count > 0)
+            if (pointed_cell.Troops > 0)
             {
                 _troop_source = source;
                 if (divide)
                 {
-                    if (pointed_cell.hex.IsOrigin() && pointed_cell.Troop_Count == 1) return;
-                    _troop_split = (int)Math.Ceiling(pointed_cell.Troop_Count / 2.0f);
-                    _max_troops = (int)pointed_cell.Troop_Count;
+                    if (pointed_cell.hex.IsOrigin() && pointed_cell.Troops == 1) return;
+                    _troop_split = (int)Math.Ceiling(pointed_cell.Troops / 2.0f);
+                    _max_troops = (int)pointed_cell.Troops;
                     
                     // Enable the splitting textbox.
                     var indic = pointed_cell.Troop_Indic;
@@ -161,6 +185,9 @@ public class camera_controller : MonoBehaviour
         // highlight the pointed at cell
         HighlightCell(hex_pos);
 
+        // don't do much if i a big booty fart.
+        if (!is_enabled) return;
+        
         if (is_left_down == false && is_right_down == false) return; // VERY IMPORTANT!
         // Everything past this is if the left moues button has just been clicked.
         
@@ -270,8 +297,9 @@ public class camera_controller : MonoBehaviour
                     text_obj.gameObject.SetActive(false);
                 }
                 
-                _troop_source = null;
-                _troop_split = 0;
+                // _troop_source = null;
+                // _troop_split = 0;
+                CancelTroopMove();
             }
 
             if (!is_left_down && Input.GetMouseButton(1))

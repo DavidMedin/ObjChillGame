@@ -10,10 +10,9 @@ namespace DefaultNamespace
         // Define the singleton
         public static network_scene_manager Singleton;
         
-        // Parameters
-
         
-    #if UNITY_EDITOR
+        
+        #if UNITY_EDITOR
             public UnityEditor.SceneAsset SceneAsset;
             private void OnValidate()
             {
@@ -22,7 +21,8 @@ namespace DefaultNamespace
                     _game_scene = SceneAsset.name;
                 }
             }
-    #endif
+        #endif
+        
         [SerializeField]private string _game_scene = "GameScene";
         // This will not run for clients.
         private void OnClientEntered(ulong clientId)
@@ -45,24 +45,7 @@ namespace DefaultNamespace
             }
         }
 
-        [ServerRpc]
-        public void InitializeClientServerRpc(ServerRpcParams serverRpcParams= default)
-        {
-            
-        }
-
-        // This function is the initialization of the world.
-        // private void StartGame()
-        // {
-        //     PlaceCellClientRpc(new Hex{r=0,q=0,chunk=new Vector2Int(0,0)} , Biome.castle);
-        //     
-        //     var player_two_hex = new Hex { r = 0, q = (int)castle_distance, chunk = new Vector2Int(0, 0) };
-        //     player_two_hex.SnapToGrid();
-        //     PlaceCellClientRpc( player_two_hex, Biome.castle);
-        // }
-
         
-
         public override void OnNetworkSpawn()
         {
             if (Singleton == null) Singleton = this;
@@ -73,10 +56,6 @@ namespace DefaultNamespace
             }
 
             print("Done with scene mngr start()");
-        }
-        private void Start()
-        {
-            
         }
     }
 }
