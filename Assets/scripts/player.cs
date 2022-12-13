@@ -26,7 +26,15 @@ namespace DefaultNamespace
             
             // Only ask if we own this.
             if (IsOwner) RequestInitServerRpc();
-            
+            else
+            {
+                var player_one_hex = new Hex{r = 0, q = 0, chunk = new Vector2Int(0, 0)};
+                var player_two_hex = new Hex{r = 0, q = (int)castle_distance, chunk = new Vector2Int(0, 0)};
+                player_two_hex.SnapToGrid();
+                _players = GameObject.FindGameObjectsWithTag("Player");
+                _players[0].transform.position = _grid.Hex2Global(player_one_hex);
+                _players[1].transform.position = _grid.Hex2Global(player_two_hex);
+            }
             
             print($"Done loading, I am {OwnerClientId}");
             GameObject.Find("net_turn_mngr").GetComponent<TurnManager>().OnTurnChange(1,0);
