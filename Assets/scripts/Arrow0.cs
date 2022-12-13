@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
  
-public class Arrow : MonoBehaviour {
+public class Arrow0 : MonoBehaviour {
      
     public GameObject goTarget;
     private GameObject[] _players; 
@@ -10,6 +10,9 @@ public class Arrow : MonoBehaviour {
     {
         _players = GameObject.FindGameObjectsWithTag("Player");
         goTarget = _players[0];
+        
+        Vector3 v3Pos = Camera.main.WorldToViewportPoint(goTarget.transform.position);
+        transform.position = Camera.main.ViewportToWorldPoint(v3Pos);
     }
     
     void Update () {
@@ -36,11 +39,13 @@ public class Arrow : MonoBehaviour {
         //   a full projection onto the plane
         
         float fAngle = Mathf.Atan2 (v3Pos.x, v3Pos.y);
-        transform.localEulerAngles = new Vector3(0.0f, 0.0f, -fAngle * Mathf.Rad2Deg);
+        transform.localEulerAngles = new Vector3(-60.0f, fAngle * Mathf.Rad2Deg, 0.0f);
+        //transform.localEulerAngles = new Vector3(0.0f, -fAngle * Mathf.Rad2Deg, 0.0f);
+
         
         v3Pos.x = 0.5f * Mathf.Sin (fAngle) + 0.5f;  // Place on ellipse touching 
-        v3Pos.y = 0.5f * Mathf.Cos (fAngle) + 0.5f;  //   side of viewport
-        v3Pos.z = Camera.main.nearClipPlane + 0.01f;  // Looking from neg to pos Z;
+        v3Pos.z = 0.5f * Mathf.Cos (fAngle) + 0.5f;  //   side of viewport
+        v3Pos.y = Camera.main.nearClipPlane + 0.01f;  // Looking from neg to pos Z;
         transform.position = Camera.main.ViewportToWorldPoint(v3Pos);
     }
 }
