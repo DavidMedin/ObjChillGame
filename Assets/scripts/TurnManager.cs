@@ -16,7 +16,6 @@ namespace DefaultNamespace
 
         [SerializeField] private GameObject _camera;
         [SerializeField] private GameObject _stacker;
-        
         [SerializeField] private GameObject _endTurnButton;
 
         //void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -29,15 +28,18 @@ namespace DefaultNamespace
         [ServerRpc(RequireOwnership = false)]
         public void RequestEndOfTurnServerRpc(ServerRpcParams serverRpcParams = default)
         {
-            print("Client requested end of turn!");
-            if (whos_turn.Value != serverRpcParams.Receive.SenderClientId)
+            var clientId = serverRpcParams.Receive.SenderClientId;
+            print($"Client {clientId} requested end of turn!");
+            if (whos_turn.Value != clientId)
             {
                 print("Rejected : it is not their turn.");
                 return;
             }
 
-            whos_turn.Value = (OwnerClientId + 1) % 2;
-            print($"turn changed, was {whos_turn.Value}, is -> {OwnerClientId} -> {(OwnerClientId + 1) % 2}");
+            print($"Current turn is: {whos_turn.Value}");
+            whos_turn.Value = (clientId + 1) % 2;
+            print($"Turn changed to: {whos_turn.Value}");
+            //print($"turn changed, was {whos_turn.Value}, is -> {OwnerClientId} -> {(OwnerClientId + 1) % 2}");
         }
         
         public void OnTurnChange(ulong prev, ulong now)
@@ -60,7 +62,7 @@ namespace DefaultNamespace
             {
                 print("it is not my turn anymore.");
                 // disable end turn button
-                _endTurnButton.SetActive(true);
+                _endTurnButton.SetActive(false);
                 // disable tile and troop movement
                 _camera.GetComponent<camera_controller>().is_enabled = false;
             }
