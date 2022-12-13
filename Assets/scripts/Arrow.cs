@@ -4,7 +4,7 @@ using System.Collections;
 public class Arrow : MonoBehaviour {
      
     public GameObject goTarget;
-    private Gameobject _players[];
+    private GameObject[] _players; 
 
     void Start()
     {
