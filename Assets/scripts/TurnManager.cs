@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using EasyButtons;
 using Unity.Netcode;
-using EasyButtons;
+//using EasyButtons;
 using UnityEngine.SceneManagement;
 
 namespace DefaultNamespace

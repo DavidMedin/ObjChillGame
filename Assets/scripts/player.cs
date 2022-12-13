@@ -167,10 +167,10 @@ namespace DefaultNamespace
             if (dest_cell.is_owned && dest_cell.owner_id != OwnerClientId)
             {
                 // We are attacking this cell.
-                if (move_count < dest_cell.Troops)
-                {
-                    dest_cell.owner_id = dest_cell.owner_id;
-                }
+                //if (move_count < dest_cell.Troops)
+                //{
+                //    dest_cell.owner_id = dest_cell.owner_id;
+                //}
                 
                 if (move_count > dest_cell.Troops)
                 {
